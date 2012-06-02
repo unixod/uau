@@ -37,7 +37,7 @@ size_t chunkLength(ChunkCoord itm, size_t len, map::const_iterator first, map::c
         ((fnd = [&](){
             auto begin = first->begin();
             auto end = first->end();
-            auto iter = std::lower_bound(begin, end, fnd+1);
+            auto iter = std::upper_bound(begin, end, fnd);
             return (iter != end) && (*iter == fnd+1) ? *iter : -1;
         }()) != -1)){
         return chunkLength(fnd, len, ++first, last) + 1;
