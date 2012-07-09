@@ -36,6 +36,10 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
+/** @file concurrency_algo.h
+    Concurrency algorithms header
+*/
+
 #ifndef CONCURRENCY_ALGO_H
 #define CONCURRENCY_ALGO_H
 
@@ -110,9 +114,20 @@ void maxChunks(std::pair<ChunkSize, ChunkSet> &chunksGrp, int id, int k, size_t 
 
 } // namespace _intersection
 
-/*
-  k - threads count, to parallel proccesing
-  m - minimum len
+
+/**
+  @brief    Constructs the set of maximum intersections of the two sorted ranges
+  @param    k   threads count, to parallel proccesing
+  @param    m   minimum len
+  @param    first1  An input iterator.
+  @param    last1  An input iterator.
+  @param    first2  An input iterator.
+  @param    last2  An input iterator.
+  @return   returns chucks group. Chuncks group consists of two parts:
+            - chunk size (size of every chunk in group)
+            - sequence of chunks (coords in first and second input sequences)
+
+  For more details of this algorithm see: http://habrahabr.ru/post/145198/
 */
 template<class InputIterator1, class InputIterator2>
 std::pair<ChunkSize, ChunkSet> maxIntersections(int k, size_t m, InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2){

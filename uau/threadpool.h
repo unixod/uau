@@ -46,6 +46,38 @@
 
 namespace uau{
 
+/**
+  @brief Thread pool (blocking version)
+
+  Usage:
+  @code
+    void someTask1(){
+        ...
+    }
+
+    void someTask2(int rank,  std::vector<int> &out){
+        ...
+    }
+
+    void func(){
+        uau::BlockingThreadPool pool(5); //reserving 5 worker threads
+
+        for(...){
+            pool(someTask1);
+        }
+        pool.wait();
+
+
+        typedef std::vector<int> Result;
+        int cnt = ...
+        std::vector<Result> res(cnt);
+        for(int i = 0; i < cnt; i++){
+            pool(someTask2, i, std::ref(res[i]));
+        }
+        pool.wait();
+    }
+  @endcode
+*/
 class BlockingThreadPool{
     std::atomic<int> inProgress;
     std::mutex mtx;

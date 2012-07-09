@@ -44,10 +44,43 @@
 
 namespace uau{
 
+/**
+  @brief Represents of ranges sequence
+
+  Usage:
+  @code
+    void func(){
+        uau::RangeSet<int> rng;
+        rng.assign_range(0, 10);    //encompasses one range: {0, 10} inclusive
+        rng.exclude(5, 8);          //now rng encompasses two ranges: {0, 4} and {9, 10}
+        rng.exclude(0, 6);          //now rng encompasses only: {9, 10}
+    }
+  @endcode
+
+  RangeSet can also be based on custom (STL-compatible) sequence containers, for example:
+  @code
+    void func(){
+        uau::RangeSet<int, QList> rng;
+        rng.assign_range(0, 10);    //consists one range: {0, 10} inclusive
+        ....
+        auto v = rng.toVector();    //QList's interface using
+    }
+  @endcode
+*/
 template <class T, template<class ...> class Sequence = std::list>
 class RangeSet : public Sequence< std::pair<T, T> >{
 public:
+    /**
+      @brief    initial range
+      @param    min lower buond (inclusive)
+      @param    max upper bound (inclusive)
+    */
     void assign_range(T min, T max);
+
+    /**
+      @param    min lower bound (inclusive)
+      @param    max upper bound (inclusive)
+    */
     void exclude(T min, T max);
 };
 
