@@ -59,6 +59,13 @@ namespace uau{
         ...
     }
 
+    class SomeTask3{
+    public:
+        void doWork(...){
+            ...
+        }
+    };
+
     void func(){
         uau::BlockingThreadPool pool(5); //reserving 5 worker threads
 
@@ -74,6 +81,10 @@ namespace uau{
         for(int i = 0; i < cnt; i++){
             pool(someTask2, i, std::ref(res[i]));
         }
+        pool.wait();
+
+        SomeTask3 task3;
+        pool(&SomeTask3::doWork, &task3, ...);
         pool.wait();
     }
   @endcode
@@ -106,13 +117,13 @@ public:
 
     template<typename Callable, typename... Args>
     void operator()(Callable &&f, Args&&... args){
+        auto task = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
         if(!ths.empty()){
-            auto task = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
             std::unique_lock<std::mutex> lck(mtx);
             tasks.push(task);
             full.notify_all();  //in theory full.notify_one(); is better, but in practic the opposit, why???
         } else {
-            f(std::forward<Args>(args)...);
+            task();
         }
     }
 
