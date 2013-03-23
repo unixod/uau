@@ -43,6 +43,8 @@
 #include <thread>
 #include <vector>
 #include <queue>
+#include <mutex>
+#include <condition_variable>
 
 namespace uau{
 
@@ -84,27 +86,20 @@ namespace uau{
         pool.wait();
 
         SomeTask3 task3;
-        pool(&SomeTask3::doWork, &task3, ...);
+        pool(&SomeTask3::doWork, task3, ...);
         pool.wait();
     }
   @endcode
 */
 class BlockingThreadPool{
-    std::atomic<int> inProgress;
-    std::mutex mtx;
-    std::condition_variable  full;
-    std::condition_variable  empty;
 
-    typedef std::function<void()> Task;
-    std::queue<Task> tasks;
-    std::vector<std::thread> ths;
-
-    volatile bool exit;
 public:
+
     BlockingThreadPool(int i) : inProgress(0), exit(false){
         while(i--)
-            ths.emplace_back(std::thread(std::mem_fun(&BlockingThreadPool::threadMain), this));
+            ths.emplace_back(std::thread(&BlockingThreadPool::threadMain, this));
     }
+
     ~BlockingThreadPool(){
         {
             std::unique_lock<std::mutex> lck(mtx);
@@ -133,12 +128,13 @@ public:
     }
 
 private:
+
     void threadMain(){
         while(1){
             Task task;
             {
                 std::unique_lock<std::mutex> lck(mtx);
-                full.wait(lck, [&tasks, &exit](){return exit || !tasks.empty();});
+                full.wait(lck, [this](){return exit || !tasks.empty();});
                 if(exit) break;
 
                 task = tasks.front();
@@ -150,6 +146,19 @@ private:
             empty.notify_one();
         }
     }
+
+private:
+
+    std::atomic<int> inProgress;
+    std::mutex mtx;
+    std::condition_variable  full;
+    std::condition_variable  empty;
+
+    typedef std::function<void()> Task;
+    std::queue<Task> tasks;
+    volatile bool exit;
+
+    std::vector<std::thread> ths;
 };
 
 } //namespace uau
