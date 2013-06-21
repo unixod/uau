@@ -101,11 +101,12 @@ public:
     }
 
     ~BlockingThreadPool(){
-        {
-            std::unique_lock<std::mutex> lck(mtx);
-            exit = true;
-        }
+        std::unique_lock<std::mutex> lck(mtx);
+
+        exit = true;
         full.notify_all();
+        lck.unlock();
+
         for(auto &t : ths)
             t.join();
     }
@@ -124,26 +125,34 @@ public:
 
     void wait(){
         std::unique_lock<std::mutex> lck(mtx);
-        empty.wait(lck, [&](){return ths.empty() || (tasks.empty() && !inProgress);});
+        empty.wait(lck, [this]{
+            return ths.empty() || (tasks.empty() && !inProgress);
+        });
     }
 
 private:
 
     void threadMain(){
         while(1){
-            Task task;
-            {
-                std::unique_lock<std::mutex> lck(mtx);
-                full.wait(lck, [this](){return exit || !tasks.empty();});
-                if(exit) break;
+            std::unique_lock<std::mutex> lck(mtx);
 
-                task = tasks.front();
-                tasks.pop();
-            }
+            empty.notify_all();
+
+            full.wait(lck, [this]{return exit || !tasks.empty();});
+            if(exit) break;
+
+            Task task = tasks.front();
+            tasks.pop();
+
+            lck.unlock();
+
             ++inProgress;
-            task();
+
+            try{
+                task();
+            } catch (...) {}
+
             --inProgress;
-            empty.notify_one();
         }
     }
 
