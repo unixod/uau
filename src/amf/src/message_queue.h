@@ -36,11 +36,14 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_ACTOR_H
-#define UAU_AMF_ACTOR_H
+#ifndef UAU_AMF_IMPL_MESSAGE_QUEUE_H
+#define UAU_AMF_IMPL_MESSAGE_QUEUE_H
 
 
 #include <memory>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
 
 
 namespace uau {
@@ -48,25 +51,17 @@ namespace amf {
 
 
 class Message;
-class ActorPrivate;
 
 
-class Actor {
+class MessageQueue {
 public:
-    class Id;
+    void push(std::unique_ptr<Message>);
+    std::unique_ptr<Message> waitAndPop();
 
-    Actor();
-    virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
-
-    std::unique_ptr<Message> popFromOutput();   /*concurrent*/
-    void pushToInput(std::unique_ptr<Message>); /*concurrent*/
-    void activate();
-    bool isActive() const;                      /*concurrent*/
-    Id id() const;                              /*concurrent*/
-
-protected:
-    Actor(ActorPrivate *);
-    std::unique_ptr<ActorPrivate> d_ptr;
+private:
+    std::queue<std::unique_ptr<Message>> q;
+    std::mutex mx;
+    std::condition_variable cond;
 };
 
 
@@ -74,6 +69,6 @@ protected:
 } // namespace uau
 
 
-#endif // UAU_AMF_ACTOR_H
+#endif // UAU_AMF_IMPL_MESSAGE_QUEUE_H
 
 

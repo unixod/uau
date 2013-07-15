@@ -68,3 +68,5 @@ debug
 release
 tmp
 
+# Qt Creator generated files
+CMakeLists.txt.user

@@ -44,8 +44,8 @@ namespace uau {
 namespace amf {
 
 
-struct Message{
-    virtual ~Message(){}
+struct Message {
+    virtual ~Message() {}
 };
 
 
