@@ -122,7 +122,7 @@ class MessageHandler;
 template<>
 class MessageHandler<> {
 public:
-    virtual bool handle(Message *msg){
+    virtual bool handle(const Message *msg){
         return next ? next->handle(msg) : false;
     }
 
@@ -140,13 +140,16 @@ private:
 
 template<class T>
 class MessageHandler<T> : public MessageHandler<> {
+    typedef typename std::add_const<
+        typename std::remove_pointer<T>::type
+    >::type HandledType;
 public:
     template<class Callable, class... Args>
     MessageHandler(Callable &&f, Args&&... args) :
         hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(Message *msg) {
-        if(dynamic_cast<T*>(msg)){
+    bool handle(const Message *msg) {
+        if(dynamic_cast<HandledType*>(msg)){
             hnd();
             return true;
         }
@@ -160,13 +163,16 @@ protected:
 
 template<class T, class... Ts>
 class MessageHandler<T, Ts...> : public MessageHandler<Ts...> {
+    typedef typename std::add_const<
+        typename std::remove_pointer<T>::type
+    >::type HandledType;
 public:
     template<class Callable, class... Args>
     MessageHandler(Callable &&f, Args&&... args) :
         MessageHandler<Ts...>(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(Message *msg) {
-        if(dynamic_cast<T*>(msg)) {
+    bool handle(const Message *msg) {
+        if(dynamic_cast<HandledType*>(msg)) {
 //            hnd();                    // error - why I must use MessageHandler<Ts...>::hnd(); instead?
             MessageHandler<Ts...>::hnd();
             return true;
