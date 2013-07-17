@@ -28,6 +28,6 @@ inline void uau::amf::Actor::pushToInput(std::unique_ptr<uau::amf::Message> msg)
 
 void uau::amf::Actor::activate() {
     message = std::move(d_ptr->inputQueue.waitAndPop());
-    handler.handle(message.get());
+    uau::amf::MessageHandler<> h = std::move(handler);
+    h.handle(message.get());
 }
-
