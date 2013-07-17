@@ -139,7 +139,7 @@ const lest::test specification[] = {
         std::unique_ptr<uau::amf::Message> msg3(new Msg3);
         EXPECT(h1.handle(msg3.get()));
         EXPECT(!h2.handle(msg3.get()));
-    }/*,
+    },
 
     "handlers overriding", []{
         HandlerName lastInvokedHandler;
@@ -153,7 +153,7 @@ const lest::test specification[] = {
         h.setHandlerFor<Msg1>(handlerForMultipleMessages);
         EXPECT(h.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
-    }*/
+    }
 };
 
 int main() {
