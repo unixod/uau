@@ -52,7 +52,7 @@ class Router {
 public:
     virtual std::vector<Actor::Id> rout(Actor::Id, Message *) = 0;  /*concurrent*/
 
-    virtual ~Router(){}
+    virtual ~Router() {}
 };
 
 

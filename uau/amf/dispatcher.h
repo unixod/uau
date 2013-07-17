@@ -48,7 +48,7 @@ class Dispatcher{
 public:
     virtual void dispatch();    /*concurrent*/
 
-    virtual ~Dispatcher(){}
+    virtual ~Dispatcher() {}
 };
 
 

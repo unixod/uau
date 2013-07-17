@@ -39,6 +39,7 @@
 #ifndef THREADPOOL_H
 #define THREADPOOL_H
 
+
 #include <atomic>
 #include <thread>
 #include <vector>
@@ -46,32 +47,34 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace uau{
+
+namespace uau {
+
 
 /**
   @brief Thread pool (blocking version)
 
   Usage:
   @code
-    void someTask1(){
+    void someTask1() {
         ...
     }
 
-    void someTask2(int rank,  std::vector<int> &out){
+    void someTask2(int rank,  std::vector<int> &out) {
         ...
     }
 
-    class SomeTask3{
+    class SomeTask3 {
     public:
-        void doWork(...){
+        void doWork(...) {
             ...
         }
     };
 
-    void func(){
+    void func() {
         uau::BlockingThreadPool pool(5); //reserving 5 worker threads
 
-        for(...){
+        for(...) {
             pool(someTask1);
         }
         pool.wait();
@@ -80,7 +83,7 @@ namespace uau{
         typedef std::vector<int> Result;
         int cnt = ...
         std::vector<Result> res(cnt);
-        for(int i = 0; i < cnt; i++){
+        for(int i = 0; i < cnt; i++) {
             pool(someTask2, i, std::ref(res[i]));
         }
         pool.wait();
@@ -91,16 +94,14 @@ namespace uau{
     }
   @endcode
 */
-class BlockingThreadPool{
-
+class BlockingThreadPool {
 public:
-
-    BlockingThreadPool(int i) : inProgress(0), exit(false){
+    BlockingThreadPool(int i) : inProgress(0), exit(false) {
         while(i--)
             ths.emplace_back(std::thread(&BlockingThreadPool::threadMain, this));
     }
 
-    ~BlockingThreadPool(){
+    ~BlockingThreadPool() {
         std::unique_lock<std::mutex> lck(mtx);
 
         exit = true;
@@ -112,9 +113,9 @@ public:
     }
 
     template<typename Callable, typename... Args>
-    void operator()(Callable &&f, Args&&... args){
+    void operator()(Callable &&f, Args&&... args) {
         auto task = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
-        if(!ths.empty()){
+        if(!ths.empty()) {
             std::unique_lock<std::mutex> lck(mtx);
             tasks.push(task);
             full.notify_all();  //in theory full.notify_one(); is better, but in practic the opposit, why???
@@ -123,7 +124,7 @@ public:
         }
     }
 
-    void wait(){
+    void wait() {
         std::unique_lock<std::mutex> lck(mtx);
         empty.wait(lck, [this]{
             return ths.empty() || (tasks.empty() && !inProgress);
@@ -131,9 +132,8 @@ public:
     }
 
 private:
-
-    void threadMain(){
-        while(1){
+    void threadMain() {
+        for(;;) {
             std::unique_lock<std::mutex> lck(mtx);
 
             empty.notify_all();
@@ -157,7 +157,6 @@ private:
     }
 
 private:
-
     std::atomic<int> inProgress;
     std::mutex mtx;
     std::condition_variable  full;
@@ -170,7 +169,9 @@ private:
     std::vector<std::thread> ths;
 };
 
+
 } //namespace uau
+
 
 #endif // THREADPOOL_H
 

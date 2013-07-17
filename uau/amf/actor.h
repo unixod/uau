@@ -69,14 +69,14 @@ public:
 
 protected:
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
-    void on(FRet (Derived::*mF)(FArgs...), Args&&... args){
+    void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
         auto h = std::bind(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
         handler.setHandlerFor<Msgs...>(std::move(h));
     }
 
     template<class... Msgs, class Callable, class... Args>
     typename std::enable_if<not std::is_member_function_pointer<Callable>::value>::type
-    on(Callable &&f, Args&&... args){
+    on(Callable &&f, Args&&... args) {
         auto h = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
         handler.setHandlerFor<Msgs...>(std::move(h));
     }

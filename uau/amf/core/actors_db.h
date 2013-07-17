@@ -56,7 +56,7 @@ public:
     virtual iterator begin() const = 0;                         /*concurrent*/
     virtual iterator end() const = 0;                           /*concurrent*/
 
-    virtual ~ActorsDB(){}
+    virtual ~ActorsDB() {}
 };
 
 

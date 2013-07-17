@@ -18,7 +18,7 @@ public:
         return handlerName;
     }
 
-    ~HandlerName(){
+    ~HandlerName() {
         if(isObserver)
             handlerName.clear();
     }
@@ -156,7 +156,7 @@ const lest::test specification[] = {
     }*/
 };
 
-int main(){
+int main() {
     handler.setHandlerFor<Msg1>(handlerFreeFunc);
     handler.setHandlerFor<Msg2>(handlerFreeFuncWithArgs, 1, "second");
     Foo foo;

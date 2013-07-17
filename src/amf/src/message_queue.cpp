@@ -2,14 +2,14 @@
 #include "message.h"
 
 
-void uau::amf::MessageQueue::push(std::shared_ptr<Message> msg){
+void uau::amf::MessageQueue::push(std::shared_ptr<Message> msg) {
     std::lock_guard<std::mutex> lck(mx);
 
     q.push(std::move(msg));
     cond.notify_all();
 }
 
-std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop(){
+std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop() {
     std::unique_lock<std::mutex> lck(mx);
 
     cond.wait(lck, [this]{

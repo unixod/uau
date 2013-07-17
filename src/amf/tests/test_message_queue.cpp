@@ -53,6 +53,6 @@ const lest::test specification[] = {
 };
 
 
-int main(){
+int main() {
     return lest::run(specification);
 }
