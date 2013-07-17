@@ -43,7 +43,7 @@ const lest::test specification[] = {
             std::generate_n(std::back_inserter(v), k, [&i](){return i++;});
 
             for(int i = 0; i < k; i++) {
-                std::unique_ptr<Msg> msg(static_cast<Msg*>(queue.waitAndPop().release()));
+                std::shared_ptr<Msg> msg = std::dynamic_pointer_cast<Msg>(queue.waitAndPop());
                 v.erase(std::lower_bound(v.begin(), v.end(), msg->getNum()));
             }
 

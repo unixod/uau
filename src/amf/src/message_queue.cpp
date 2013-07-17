@@ -2,24 +2,34 @@
 #include "message.h"
 
 
-void uau::amf::MessageQueue::push(std::unique_ptr<Message> msg){
+void uau::amf::MessageQueue::push(std::shared_ptr<Message> msg){
     std::lock_guard<std::mutex> lck(mx);
 
     q.push(std::move(msg));
     cond.notify_all();
 }
 
-std::unique_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop(){
+std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop(){
     std::unique_lock<std::mutex> lck(mx);
 
     cond.wait(lck, [this]{
         return !q.empty();
     });
 
-    std::unique_ptr<Message> msg = std::move(q.front());
+    std::shared_ptr<Message> msg = std::move(q.front());
     q.pop();
 
     return msg;
 }
+
+size_t uau::amf::MessageQueue::size() const {
+    std::lock_guard<std::mutex> lck(mx);
+
+    auto sz = q.size();
+    cond.notify_all();
+
+    return sz;
+}
+
 
 

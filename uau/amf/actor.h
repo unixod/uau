@@ -41,6 +41,8 @@
 
 
 #include <memory>
+#include <functional>
+#include "message_handler.h"
 
 
 namespace uau {
@@ -55,17 +57,38 @@ class Actor {
 public:
     class Id;
 
-    Actor();
-    virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
-
-    std::unique_ptr<Message> popFromOutput();   /*concurrent*/
+    size_t outputQueueSize() const;             /*concurrent*/
+    size_t inputQueueSize() const;              /*concurrent*/
+    std::shared_ptr<Message> popFromOutput();   /*concurrent*/
     void pushToInput(std::unique_ptr<Message>); /*concurrent*/
     void activate();
     bool isActive() const;                      /*concurrent*/
     Id id() const;                              /*concurrent*/
 
+    virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
+
 protected:
-    Actor(ActorPrivate *);
+    template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
+    void on(FRet (Derived::*mF)(FArgs...), Args&&... args){
+        auto h = std::bind(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
+        handler.setHandlerFor<Msgs...>(std::move(h));
+    }
+
+    template<class... Msgs, class Callable, class... Args>
+    typename std::enable_if<not std::is_member_function_pointer<Callable>::value>::type
+    on(Callable &&f, Args&&... args){
+        auto h = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
+        handler.setHandlerFor<Msgs...>(std::move(h));
+    }
+
+protected:
+    Actor();                                    // this is abstract class
+//    HandlerQueue handler;
+    MessageHandler<> handler;
+    std::shared_ptr<const Message> message;
+
+protected:
+    Actor(std::unique_ptr<ActorPrivate>);
     std::unique_ptr<ActorPrivate> d_ptr;
 };
 

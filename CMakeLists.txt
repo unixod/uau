@@ -26,7 +26,7 @@ set(3RDPARTY_LIB_DIR
 add_subdirectory(src)
 
 # include directory content for convenience in editing in IDE
-add_custom_target(UAU_INCLUDES ALL SOURCES
+add_custom_target(_FOR_IDE_UAU_INCLUDES ALL SOURCES
     "${UAU_INCLUDE_DIR}/concurrency_algo.h"
     "${UAU_INCLUDE_DIR}/rangeset.h"
     "${UAU_INCLUDE_DIR}/threadpool.h")

@@ -55,13 +55,14 @@ class Message;
 
 class MessageQueue {
 public:
-    void push(std::unique_ptr<Message>);
-    std::unique_ptr<Message> waitAndPop();
+    void push(std::shared_ptr<Message> msg);            /*concurrent*/
+    std::shared_ptr<Message> waitAndPop();              /*concurrent*/
+    size_t size() const;                                /*concurrent*/
 
 private:
-    std::queue<std::unique_ptr<Message>> q;
-    std::mutex mx;
-    std::condition_variable cond;
+    std::queue<std::shared_ptr<Message>> q;
+    mutable std::mutex mx;
+    mutable std::condition_variable cond;
 };
 
 

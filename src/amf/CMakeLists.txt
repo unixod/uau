@@ -9,11 +9,11 @@ set(AMF_SOURCE_DIR
 add_subdirectory(src)
 
 if(WITH_TESTS)
-    add_subdirectory(test)
+    add_subdirectory(tests)
     endif()
 
 # include directory content for convenience in editing in IDE
-add_custom_target(AMF_INCLUDES ALL SOURCES
+add_custom_target(_FOR_IDE_AMF_INCLUDES ALL SOURCES
     "${AMF_INCLUDE_DIR}/actor.h"
     "${AMF_INCLUDE_DIR}/dispatcher.h"
     "${AMF_INCLUDE_DIR}/message.h"

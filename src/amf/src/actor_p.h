@@ -40,14 +40,18 @@
 #define UAU_AMF_IMPL_ACTORPRIVATE_H
 
 
+#include "message_queue.h"
+#include "message.h"
+
+
 namespace uau {
 namespace amf {
 
 
 class ActorPrivate {
 public:
-
-    virtual ~ActorPrivate() {}
+    MessageQueue inputQueue;
+    MessageQueue outputQueue;
 };
 
 
