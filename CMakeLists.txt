@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(uau)
 
+include(cmake/showHeadersInIDE.cmake)
+
 #======================================================================#
 # Configuration
 #======================================================================#
@@ -10,11 +12,11 @@ project(uau)
 #TEMPORARY HACK!!! (cmake stil not yet support switching to C++11)
 if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "-std=c++0x")
-    endif(CMAKE_COMPILER_IS_GNUCXX)
+endif()
 
 if(WITH_TESTS)
     enable_testing()
-    endif()
+endif()
 
 #======================================================================#
 set(UAU_INCLUDE_DIR
@@ -25,10 +27,7 @@ set(3RDPARTY_LIB_DIR
 
 add_subdirectory(src)
 
-# include directory content for convenience in editing in IDE
-add_custom_target(_FOR_IDE_UAU_INCLUDES ALL SOURCES
+showHeadersInIDE(
     "${UAU_INCLUDE_DIR}/concurrency_algo.h"
     "${UAU_INCLUDE_DIR}/rangeset.h"
     "${UAU_INCLUDE_DIR}/threadpool.h")
-
-
