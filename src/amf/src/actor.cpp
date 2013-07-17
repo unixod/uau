@@ -31,3 +31,7 @@ void uau::amf::Actor::activate() {
     uau::amf::MessageHandler<> h = std::move(handler);
     h.handle(message.get());
 }
+
+void uau::amf::Actor::send(std::unique_ptr<uau::amf::Message> msg){
+    d_ptr->outputQueue.push(std::move(msg));
+}

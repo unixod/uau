@@ -81,9 +81,10 @@ protected:
         handler.setHandlerFor<Msgs...>(std::move(h));
     }
 
+    void send(std::unique_ptr<Message>);
+
 protected:
-    Actor();                                    // this is abstract class
-//    HandlerQueue handler;
+    Actor();                                    // this class is abstract
     MessageHandler<> handler;
     std::shared_ptr<const Message> message;
 
