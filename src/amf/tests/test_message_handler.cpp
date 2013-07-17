@@ -38,12 +38,12 @@ class Msg4 : public uau::amf::Message{};
 class Msg5 : public uau::amf::Message{};
 
 
-void handlerFreeFunc(){
+void handlerFreeFunc() {
     HandlerName("handlerFreeFunc");
 }
 
 
-void handlerFreeFuncWithArgs(int i, const std::string &str){
+void handlerFreeFuncWithArgs(int i, const std::string &str) {
     HandlerName("handlerFreeFuncWithArgs");
 }
 
@@ -54,7 +54,7 @@ public:
     }
 };
 
-void handlerForMultipleMessages(){
+void handlerForMultipleMessages() {
     HandlerName("handlerForMultipleMessages");
 }
 
@@ -103,6 +103,8 @@ const lest::test specification[] = {
     },
 
     "move constructor", []{
+        HandlerName lastInvokedHandler;
+
         uau::amf::MessageHandler<> h1;
         h1.setHandlerFor<Msg1>([]{});
 
@@ -120,6 +122,8 @@ const lest::test specification[] = {
     },
 
     "move assignment", []{
+        HandlerName lastInvokedHandler;
+
         uau::amf::MessageHandler<> h1;
         h1.setHandlerFor<Msg1>(handlerFreeFunc);
 
@@ -135,7 +139,21 @@ const lest::test specification[] = {
         std::unique_ptr<uau::amf::Message> msg3(new Msg3);
         EXPECT(h1.handle(msg3.get()));
         EXPECT(!h2.handle(msg3.get()));
-    },
+    }/*,
+
+    "handlers overriding", []{
+        HandlerName lastInvokedHandler;
+        uau::amf::MessageHandler<> h;
+        h.setHandlerFor<Msg1>(handlerFreeFunc);
+
+        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        EXPECT(h.handle(msg.get()));
+        EXPECT(lastInvokedHandler.name() == "handlerFreeFunc");
+
+        h.setHandlerFor<Msg1>(handlerForMultipleMessages);
+        EXPECT(h.handle(msg.get()));
+        EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
+    }*/
 };
 
 int main(){

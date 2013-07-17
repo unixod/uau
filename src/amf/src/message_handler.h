@@ -56,33 +56,33 @@ class Message;
 
   Usage:
   @code
-    class Msg1 : public uau::amf::Message{...};
-    class Msg2 : public uau::amf::Message{...};
-    class Msg3 : public uau::amf::Message{...};
-    class Msg4 : public uau::amf::Message{...};
-    class Msg5 : public uau::amf::Message{...};
-    class Msg6 : public uau::amf::Message{...};
+    class Msg1 : public uau::amf::Message {...};
+    class Msg2 : public uau::amf::Message {...};
+    class Msg3 : public uau::amf::Message {...};
+    class Msg4 : public uau::amf::Message {...};
+    class Msg5 : public uau::amf::Message {...};
+    class Msg6 : public uau::amf::Message {...};
 
-    void someHandler(){
+    void someHandler() {
         ...
     }
 
-    void someOtherHandler(int param, const std::string &){
+    void someOtherHandler(int param, const std::string &) {
         ...
     }
 
-    void multiHandler(int param, const std::string &){
+    void multiHandler(int param, const std::string &) {
         ...
     }
 
-    class SomeClass{
+    class SomeClass {
     public:
-        void handler(...){
+        void handler(...) {
             ...
         }
     };
 
-    void func(){
+    void func() {
         MessageHandler<> handler;
 
         // setup handlers
@@ -122,12 +122,21 @@ class MessageHandler;
 template<>
 class MessageHandler<> {
 public:
-    virtual bool handle(const Message *msg){
+    constexpr MessageHandler() = default;
+
+    MessageHandler(MessageHandler &&) = default;
+
+    MessageHandler & operator = (MessageHandler &&) = default;
+
+    virtual ~MessageHandler() {}
+
+
+    virtual bool handle(const Message *msg) {
         return next ? next->handle(msg) : false;
     }
 
     template<class... Ts, class Callable, class... Args>
-    void setHandlerFor(Callable &&f, Args&&... args){
+    void setHandlerFor(Callable &&f, Args&&... args) {
         if(next)
             next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
         else
@@ -143,13 +152,14 @@ class MessageHandler<T> : public MessageHandler<> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
+
 public:
     template<class Callable, class... Args>
     MessageHandler(Callable &&f, Args&&... args) :
         hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const Message *msg) {
-        if(dynamic_cast<HandledType*>(msg)){
+        if(dynamic_cast<HandledType*>(msg)) {
             hnd();
             return true;
         }
@@ -166,6 +176,7 @@ class MessageHandler<T, Ts...> : public MessageHandler<Ts...> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
+
 public:
     template<class Callable, class... Args>
     MessageHandler(Callable &&f, Args&&... args) :
