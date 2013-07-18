@@ -52,6 +52,7 @@ class ActorPrivate {
 public:
     MessageQueue inputQueue;
     MessageQueue outputQueue;
+    std::shared_ptr<const Message> message;
 };
 
 

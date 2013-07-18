@@ -81,10 +81,21 @@ protected:
 
     void send(std::unique_ptr<Message>);
 
+    /**
+     * @brief get received message
+     * @return received message
+     */
+    std::weak_ptr<const Message> message() const;
+
+private:
+    /**
+     * @brief Schedule this actor for deletion
+     */
+    void deleteLater();
+
 protected:
     Actor();                                    // this class is abstract
     MessageHandler<> handler;
-    std::shared_ptr<const Message> message;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);
