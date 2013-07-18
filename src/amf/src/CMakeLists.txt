@@ -17,4 +17,6 @@ add_library(${PROJECT_NAME} ${amf_SOURCES})
 showHeadersInIDE(
     "${AMF_SOURCE_DIR}/actor_p.h"
     "${AMF_SOURCE_DIR}/message_handler.h"
-    "${AMF_SOURCE_DIR}/message_queue.h")
+    "${AMF_SOURCE_DIR}/message_queue.h"
+    "${AMF_SOURCE_DIR}/core/actors_storage.cpp"
+    "${AMF_SOURCE_DIR}/core/main_router.cpp")

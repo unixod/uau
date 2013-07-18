@@ -49,7 +49,7 @@ namespace amf {
 
 class MainRouter : public Router {
 public:
-    void addRouter(std::unique_ptr<Actor>);
+    void addRouter(std::unique_ptr<Router>);
 };
 
 
