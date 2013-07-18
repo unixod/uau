@@ -117,16 +117,13 @@ class Message;
   @endcode
 */
 template<class...>
-class MessageHandler;
-
-template<>
-class MessageHandler<> {
+class MessageHandler {
 public:
-    constexpr MessageHandler() = default;
+    constexpr MessageHandler() noexcept = default;
 
-    MessageHandler(MessageHandler &&) = default;
+    MessageHandler(MessageHandler &&) noexcept = default;
 
-    MessageHandler & operator = (MessageHandler &&) = default;
+    MessageHandler & operator = (MessageHandler &&) noexcept = default;
 
     virtual ~MessageHandler() {}
 
@@ -162,7 +159,7 @@ public:
     MessageHandler(Callable &&f, Args&&... args) :
         hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(const Message *msg) {
+    bool handle(const Message *msg) override {
         if(dynamic_cast<HandledType*>(msg)) {
             hnd();
             return true;
@@ -186,7 +183,7 @@ public:
     MessageHandler(Callable &&f, Args&&... args) :
         MessageHandler<Ts...>(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(const Message *msg) {
+    bool handle(const Message *msg) override {
         if(dynamic_cast<HandledType*>(msg)) {
 //            hnd();                    // error - why I must use MessageHandler<Ts...>::hnd(); instead?
             MessageHandler<Ts...>::hnd();
