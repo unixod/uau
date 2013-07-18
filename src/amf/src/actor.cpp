@@ -14,17 +14,20 @@ inline std::shared_ptr<uau::amf::Message> uau::amf::Actor::popFromOutput() {
     return d_ptr->outputQueue.waitAndPop();
 }
 
-inline void uau::amf::Actor::pushToInput(std::unique_ptr<uau::amf::Message> msg) {
-    d_ptr->inputQueue.push(std::move(msg));
+inline void uau::amf::Actor::pushToInput(std::shared_ptr<Message> msg) {
+    d_ptr->inputQueue.push(msg);
 }
 
 void uau::amf::Actor::activate() {
+    // TODO: prepare actor for deletion in final state (handlers is empty)
+
     message = std::move(d_ptr->inputQueue.waitAndPop());
     uau::amf::MessageHandler<> h = std::move(handler);
-    h.handle(message.get());
-    // TODO does actor in final state
+
+    if(not h.handle(message.get()))
+        handler = std::move(h);
 }
 
-void uau::amf::Actor::send(std::unique_ptr<uau::amf::Message> msg){
+void uau::amf::Actor::send(std::unique_ptr<uau::amf::Message> msg) {
     d_ptr->outputQueue.push(std::move(msg));
 }

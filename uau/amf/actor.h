@@ -58,7 +58,7 @@ public:
     class Id;
 
     std::shared_ptr<Message> popFromOutput();   /*concurrent*/
-    void pushToInput(std::unique_ptr<Message>); /*concurrent*/
+    void pushToInput(std::shared_ptr<Message>); /*concurrent*/
     void activate();
     bool isActive() const;                      /*concurrent*/
     Id id() const;                              /*concurrent*/
