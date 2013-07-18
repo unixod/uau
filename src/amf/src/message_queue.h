@@ -57,7 +57,6 @@ class MessageQueue {
 public:
     void push(std::shared_ptr<Message> msg);            /*concurrent*/
     std::shared_ptr<Message> waitAndPop();              /*concurrent*/
-    size_t size() const;                                /*concurrent*/
 
 private:
     std::queue<std::shared_ptr<Message>> q;

@@ -21,15 +21,3 @@ std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop() {
 
     return msg;
 }
-
-size_t uau::amf::MessageQueue::size() const {
-    std::lock_guard<std::mutex> lck(mx);
-
-    auto sz = q.size();
-    cond.notify_all();
-
-    return sz;
-}
-
-
-

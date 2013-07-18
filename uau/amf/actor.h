@@ -57,8 +57,6 @@ class Actor {
 public:
     class Id;
 
-    size_t outputQueueSize() const;             /*concurrent*/
-    size_t inputQueueSize() const;              /*concurrent*/
     std::shared_ptr<Message> popFromOutput();   /*concurrent*/
     void pushToInput(std::unique_ptr<Message>); /*concurrent*/
     void activate();
