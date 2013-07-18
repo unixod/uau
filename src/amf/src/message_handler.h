@@ -131,6 +131,10 @@ public:
     virtual ~MessageHandler() {}
 
 
+    bool empty() const noexcept {
+        return next == nullptr;
+    }
+
     virtual bool handle(const Message *msg) {
         return next ? next->handle(msg) : false;
     }

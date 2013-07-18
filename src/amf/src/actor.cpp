@@ -19,14 +19,15 @@ inline void uau::amf::Actor::pushToInput(std::shared_ptr<Message> msg) {
 }
 
 void uau::amf::Actor::activate() {
-    // TODO: prepare actor for deletion in final state (handlers is empty)
-//    if(handler.empty()) deleteLater();
+    if(handler.empty()) {           // actor in final state
+        deleteLater();
+    } else {
+        d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
+        uau::amf::MessageHandler<> h = std::move(handler);
 
-    d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
-    uau::amf::MessageHandler<> h = std::move(handler);
-
-    if(not h.handle(d_ptr->message.get()))
-        handler = std::move(h);
+        if(not h.handle(d_ptr->message.get()))
+            handler = std::move(h);
+    }
 }
 
 void uau::amf::Actor::send(std::unique_ptr<uau::amf::Message> msg) {
@@ -38,4 +39,5 @@ std::weak_ptr<const uau::amf::Message> uau::amf::Actor::message() const {
 }
 
 void uau::amf::Actor::deleteLater() {
+    // TODO: implement
 }
