@@ -142,17 +142,23 @@ const lest::test specification[] = {
     },
 
     "handlers overriding", []{
-        HandlerName lastInvokedHandler;
         uau::amf::MessageHandler<> h;
-        h.setHandlerFor<Msg1>(handlerFreeFunc);
-
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
-        EXPECT(h.handle(msg.get()));
-        EXPECT(lastInvokedHandler.name() == "handlerFreeFunc");
 
-        h.setHandlerFor<Msg1>(handlerForMultipleMessages);
-        EXPECT(h.handle(msg.get()));
-        EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
+        {
+            HandlerName lastInvokedHandler;
+            h.setHandlerFor<Msg1>(handlerFreeFunc);
+
+            EXPECT(h.handle(msg.get()));
+            EXPECT(lastInvokedHandler.name() == "handlerFreeFunc");
+        }
+
+        {
+            HandlerName lastInvokedHandler;
+            h.setHandlerFor<Msg1>(handlerForMultipleMessages);
+            EXPECT(h.handle(msg.get()));
+            EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
+        }
     }
 };
 

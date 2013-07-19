@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 2.8)
 
 #add_subdirectory(src)
 
-if(WITH_TESTS)
+if(UAU_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 

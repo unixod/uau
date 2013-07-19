@@ -42,6 +42,7 @@
 
 #include <vector>
 #include <memory>
+#include "typeset.h"
 
 
 namespace uau {
@@ -138,15 +139,24 @@ public:
 
     template<class... Ts, class Callable, class... Args>
     void setHandlerFor(Callable &&f, Args&&... args) {
+        disable(TypeSet<Ts...>());
+
         if(next)
             next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
         else
             next.reset(new MessageHandler<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
     }
 
+protected:
+    virtual void disable(const TypeSet<> &handlerTypes) {
+        if(next)
+            next->disable(handlerTypes);
+    }
+
 private:
     std::unique_ptr<MessageHandler<>> next;
 };
+
 
 template<class T>
 class MessageHandler<T> : public MessageHandler<> {
@@ -160,7 +170,7 @@ public:
         hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const Message *msg) override {
-        if(dynamic_cast<HandledType*>(msg)) {
+        if(!disabled && dynamic_cast<HandledType*>(msg)) {
             hnd();
             return true;
         }
@@ -169,8 +179,18 @@ public:
     }
 
 protected:
+    void disable(const TypeSet<> &handlerTypes) override {
+        disabled = handlerTypes.contains<T>();
+        MessageHandler<>::disable(handlerTypes);
+    }
+
+protected:
     std::function<void()> hnd;
+
+private:
+    bool disabled = false;
 };
+
 
 template<class T, class... Ts>
 class MessageHandler<T, Ts...> : public MessageHandler<Ts...> {
@@ -184,7 +204,7 @@ public:
         MessageHandler<Ts...>(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const Message *msg) override {
-        if(dynamic_cast<HandledType*>(msg)) {
+        if(!disabled && dynamic_cast<HandledType*>(msg)) {
 //            hnd();                    // error - why I must use MessageHandler<Ts...>::hnd(); instead?
             MessageHandler<Ts...>::hnd();
             return true;
@@ -192,6 +212,15 @@ public:
 
         return MessageHandler<Ts...>::handle(msg);
     }
+
+protected:
+    void disable(const TypeSet<> &handlerTypes) override {
+        disabled = handlerTypes.contains<T>();
+        MessageHandler<Ts...>::disable(handlerTypes);
+    }
+
+private:
+    bool disabled = false;
 };
 
 
