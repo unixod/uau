@@ -1,8 +1,5 @@
-cmake_minimum_required(VERSION 2.8)
-
 project(uau)
-
-include(cmake/showHeadersInIDE.cmake)
+cmake_minimum_required(VERSION 2.8)
 
 #======================================================================#
 # Configuration
@@ -14,11 +11,18 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "-std=c++0x")
 endif()
 
-if(WITH_TESTS)
+option(UAU_BUILD_TESTS  "Enable testing" OFF)
+if(UAU_BUILD_TESTS)
     enable_testing()
 endif()
 
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 #======================================================================#
+
+include(showHeadersInIDE)
+
 set(UAU_INCLUDE_DIR
     "${CMAKE_SOURCE_DIR}/uau")
 
@@ -30,4 +34,5 @@ add_subdirectory(src)
 showHeadersInIDE(
     "${UAU_INCLUDE_DIR}/concurrency_algo.h"
     "${UAU_INCLUDE_DIR}/rangeset.h"
-    "${UAU_INCLUDE_DIR}/threadpool.h")
+    "${UAU_INCLUDE_DIR}/threadpool.h"
+    "${UAU_INCLUDE_DIR}/typeset.h")

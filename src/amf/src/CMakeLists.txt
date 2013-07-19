@@ -1,6 +1,5 @@
-cmake_minimum_required(VERSION 2.8)
-
 project(amf)
+cmake_minimum_required(VERSION 2.8)
 
 set(amf_SOURCES
     node.cpp

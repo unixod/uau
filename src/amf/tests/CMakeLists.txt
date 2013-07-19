@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-include(cmake/addTest.cmake)
+include(addTest)
 
 include_directories(
     ${3RDPARTY_LIB_DIR}

@@ -8,7 +8,7 @@ set(AMF_SOURCE_DIR
 
 add_subdirectory(src)
 
-if(WITH_TESTS)
+if(UAU_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
