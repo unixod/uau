@@ -4,9 +4,9 @@ include(addTest)
 
 include_directories(
     ${3RDPARTY_LIB_DIR}
-    ${UAU_INCLUDE_DIR}
-    ${AMF_INCLUDE_DIR}
-    ${AMF_SOURCE_DIR})
+    ${LIBUAU_INCLUDE_DIR}
+    ${LIBUAU_AMF_INCLUDE_DIR}
+    ${LIBUAU_AMF_SOURCE_DIR})
 
 # FIXME move this find_package to uau part and remove ${CMAKE_THREAD_LIBS_INIT} from addTest invokation
 find_package(Threads)

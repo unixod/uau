@@ -1,29 +1,34 @@
 project(uau)
 cmake_minimum_required(VERSION 2.8)
 
-#======================================================================#
-# Configuration
-#======================================================================#
+#===============================================================================
+# CMake configuration
+#===============================================================================
 #set(CMAKE_BUILD_TYPE "Release")
 
-#TEMPORARY HACK!!! (cmake stil not yet support switching to C++11)
-if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "-std=c++0x")
-endif()
+option(LIBUAU_BUILD_TESTS  "Enable testing" OFF)
 
-option(UAU_BUILD_TESTS  "Enable testing" OFF)
-if(UAU_BUILD_TESTS)
+if(LIBUAU_BUILD_TESTS)
     enable_testing()
 endif()
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-#======================================================================#
 
-include(showHeadersInIDE)
+#===============================================================================
+# Setup compiler flags
+#===============================================================================
+include(configCXX)
 
-set(UAU_INCLUDE_DIR
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBUAU_WALL_FLAG} ${LIBUAU_CXX11_FLAG}")
+
+#===============================================================================
+# Setup project
+#===============================================================================
+include(showFilesInIDE)
+
+set(LIBUAU_INCLUDE_DIR
     "${CMAKE_SOURCE_DIR}/uau")
 
 set(3RDPARTY_LIB_DIR
@@ -31,8 +36,8 @@ set(3RDPARTY_LIB_DIR
 
 add_subdirectory(src)
 
-showHeadersInIDE(
-    "${UAU_INCLUDE_DIR}/concurrency_algo.h"
-    "${UAU_INCLUDE_DIR}/rangeset.h"
-    "${UAU_INCLUDE_DIR}/threadpool.h"
-    "${UAU_INCLUDE_DIR}/typeset.h")
+showFilesInIDE(
+    "${LIBUAU_INCLUDE_DIR}/concurrency_algo.h"
+    "${LIBUAU_INCLUDE_DIR}/rangeset.h"
+    "${LIBUAU_INCLUDE_DIR}/threadpool.h"
+    "${LIBUAU_INCLUDE_DIR}/typeset.h")

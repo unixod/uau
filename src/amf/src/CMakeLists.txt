@@ -1,21 +1,21 @@
 project(amf)
 cmake_minimum_required(VERSION 2.8)
 
-set(amf_SOURCES
+set(LIBUAU_AMF_SOURCES
     node.cpp
     actor.cpp
     message_queue.cpp)
 
 include_directories(
-    ${UAU_INCLUDE_DIR}
-    ${AMF_INCLUDE_DIR}
-    ${AMF_SOURCE_DIR})
+    ${LIBUAU_INCLUDE_DIR}
+    ${LIBUAU_AMF_INCLUDE_DIR}
+    ${LIBUAU_AMF_SOURCE_DIR})
 
-add_library(${PROJECT_NAME} ${amf_SOURCES})
+add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
-showHeadersInIDE(
-    "${AMF_SOURCE_DIR}/actor_p.h"
-    "${AMF_SOURCE_DIR}/message_handler.h"
-    "${AMF_SOURCE_DIR}/message_queue.h"
-    "${AMF_SOURCE_DIR}/core/actors_storage.cpp"
-    "${AMF_SOURCE_DIR}/core/main_router.cpp")
+showFilesInIDE(
+    "${LIBUAU_AMF_SOURCE_DIR}/actor_p.h"
+    "${LIBUAU_AMF_SOURCE_DIR}/message_handler.h"
+    "${LIBUAU_AMF_SOURCE_DIR}/message_queue.h"
+    "${LIBUAU_AMF_SOURCE_DIR}/core/actors_storage.cpp"
+    "${LIBUAU_AMF_SOURCE_DIR}/core/main_router.cpp")
