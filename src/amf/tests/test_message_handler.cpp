@@ -49,7 +49,7 @@ void handlerFreeFuncWithArgs(int i, const std::string &str) {
 
 class Foo {
 public:
-    int bar(int) const {
+    void bar(int) const {
         HandlerName("Foo::bar");
     }
 };
