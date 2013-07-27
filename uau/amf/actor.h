@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_ACTOR_H
-#define UAU_AMF_ACTOR_H
+#ifndef LIBUAU_AMF_ACTOR_H
+#define LIBUAU_AMF_ACTOR_H
 
 
 #include <memory>
@@ -57,11 +57,12 @@ class Actor {
 public:
     class Id;
 
+    Id id() const;                              /*concurrent*/
+
     std::shared_ptr<Message> popFromOutput();   /*concurrent*/
     void pushToInput(std::shared_ptr<Message>); /*concurrent*/
+
     void activate();
-    bool active() const;                        /*concurrent*/
-    Id id() const;                              /*concurrent*/
 
     virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
 
@@ -69,14 +70,14 @@ protected:
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
     void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
         auto h = std::bind(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
-        handler.setHandlerFor<Msgs...>(std::move(h));
+        _handler.setHandlerFor<Msgs...>(std::move(h));
     }
 
     template<class... Msgs, class Callable, class... Args>
     typename std::enable_if<not std::is_member_function_pointer<Callable>::value>::type
     on(Callable &&f, Args&&... args) {
         auto h = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
-        handler.setHandlerFor<Msgs...>(std::move(h));
+        _handler.setHandlerFor<Msgs...>(std::move(h));
     }
 
     void send(std::unique_ptr<Message>);
@@ -95,7 +96,7 @@ private:
 
 protected:
     Actor();                                    // this class is abstract
-    MessageHandler<> handler;
+    MessageHandler<> _handler;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);
@@ -107,6 +108,6 @@ protected:
 } // namespace uau
 
 
-#endif // UAU_AMF_ACTOR_H
+#endif // LIBUAU_AMF_ACTOR_H
 
 

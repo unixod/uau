@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_IMPL_MESSAGE_QUEUE_H
-#define UAU_AMF_IMPL_MESSAGE_QUEUE_H
+#ifndef LIBUAU_AMF_MESSAGE_QUEUE_H
+#define LIBUAU_AMF_MESSAGE_QUEUE_H
 
 
 #include <memory>
@@ -59,9 +59,9 @@ public:
     std::shared_ptr<Message> waitAndPop();              /*concurrent*/
 
 private:
-    std::queue<std::shared_ptr<Message>> q;
-    mutable std::mutex mx;
-    mutable std::condition_variable cond;
+    std::queue<std::shared_ptr<Message>> _q;
+    mutable std::mutex _mx;
+    mutable std::condition_variable _cond;
 };
 
 
@@ -69,6 +69,6 @@ private:
 } // namespace uau
 
 
-#endif // UAU_AMF_IMPL_MESSAGE_QUEUE_H
+#endif // LIBUAU_AMF_MESSAGE_QUEUE_H
 
 

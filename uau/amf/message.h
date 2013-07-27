@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_MESSAGE_H
-#define UAU_AMF_MESSAGE_H
+#ifndef LIBUAU_AMF_MESSAGE_H
+#define LIBUAU_AMF_MESSAGE_H
 
 
 namespace uau {
@@ -53,6 +53,6 @@ struct Message {
 } // namespace uau
 
 
-#endif // UAU_AMF_MESSAGE_H
+#endif // LIBUAU_AMF_MESSAGE_H
 
 

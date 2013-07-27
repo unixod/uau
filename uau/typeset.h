@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_TYPESET_H
-#define UAU_TYPESET_H
+#ifndef LIBUAU_TYPESET_H
+#define LIBUAU_TYPESET_H
 
 
 namespace uau {

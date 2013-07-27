@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef RANGESET_H
-#define RANGESET_H
+#ifndef LIBUAU_RANGESET_H
+#define LIBUAU_RANGESET_H
 
 
 #include <list>
@@ -87,11 +87,13 @@ public:
     void exclude(T min, T max);
 };
 
+
 template <class T, template<class ...> class Sequence>
 void RangeSet<T, Sequence>::assign_range(T min, T max) {
     this->clear();
     this->push_back(std::make_pair(min, max));
 }
+
 
 template <class T, template<class ...> class Sequence>
 void RangeSet<T, Sequence>::exclude(T min, T max) {
@@ -126,6 +128,8 @@ void RangeSet<T, Sequence>::exclude(T min, T max) {
     }
 }
 
+
 } //namespace uau
 
-#endif // RANGESET_H
+
+#endif // LIBUAU_RANGESET_H

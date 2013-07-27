@@ -19,14 +19,14 @@ inline void uau::amf::Actor::pushToInput(std::shared_ptr<Message> msg) {
 }
 
 void uau::amf::Actor::activate() {
-    if(handler.empty()) {           // actor in final state
+    if(_handler.empty()) {           // actor in final state
         deleteLater();
     } else {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
-        uau::amf::MessageHandler<> h = std::move(handler);
+        uau::amf::MessageHandler<> h = std::move(_handler);
 
         if(not h.handle(d_ptr->message.get()))
-            handler = std::move(h);
+            _handler = std::move(h);
     }
 }
 

@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_CORE_ACTORS_DB_H
-#define UAU_AMF_CORE_ACTORS_DB_H
+#ifndef LIBUAU_AMF_CORE_ACTORS_DB_H
+#define LIBUAU_AMF_CORE_ACTORS_DB_H
 
 
 #include <memory>
@@ -64,6 +64,6 @@ public:
 } // namespace uau
 
 
-#endif // UAU_AMF_CORE_ACTORS_DB_H
+#endif // LIBUAU_AMF_CORE_ACTORS_DB_H
 
 

@@ -40,8 +40,8 @@
     Concurrency algorithms header
 */
 
-#ifndef CONCURRENCY_ALGO_H
-#define CONCURRENCY_ALGO_H
+#ifndef LIBUAU_CONCURRENCY_ALGO_H
+#define LIBUAU_CONCURRENCY_ALGO_H
 
 
 #include <algorithm>
@@ -182,4 +182,4 @@ std::pair<ChunkSize, ChunkSet> maxIntersections(int k, size_t m, InputIterator1 
 } // namespace uau
 
 
-#endif // CONCURRENCY_ALGO_H
+#endif // LIBUAU_CONCURRENCY_ALGO_H

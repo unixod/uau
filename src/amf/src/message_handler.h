@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_IMPL_MESSAGE_HANDLER_H
-#define UAU_AMF_IMPL_MESSAGE_HANDLER_H
+#ifndef LIBUAU_AMF_MESSAGE_HANDLER_H
+#define LIBUAU_AMF_MESSAGE_HANDLER_H
 
 
 #include <vector>
@@ -130,31 +130,31 @@ public:
 
 
     bool empty() const noexcept {
-        return next == nullptr;
+        return _next == nullptr;
     }
 
     virtual bool handle(const Message *msg) {
-        return next ? next->handle(msg) : false;
+        return _next ? _next->handle(msg) : false;
     }
 
     template<class... Ts, class Callable, class... Args>
     void setHandlerFor(Callable &&f, Args&&... args) {
         disable(TypeSet<Ts...>());
 
-        if(next)
-            next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
+        if(_next)
+            _next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
         else
-            next.reset(new MessageHandler<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
+            _next.reset(new MessageHandler<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
     }
 
 protected:
     virtual void disable(const TypeSet<> &handlerTypes) {
-        if(next)
-            next->disable(handlerTypes);
+        if(_next)
+            _next->disable(handlerTypes);
     }
 
 private:
-    std::unique_ptr<MessageHandler<>> next;
+    std::unique_ptr<MessageHandler<>> _next;
 };
 
 
@@ -167,11 +167,11 @@ class MessageHandler<T> : public MessageHandler<> {
 public:
     template<class Callable, class... Args>
     MessageHandler(Callable &&f, Args&&... args) :
-        hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
+        _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const Message *msg) override {
-        if(!disabled && dynamic_cast<HandledType*>(msg)) {
-            hnd();
+        if(!_disabled && dynamic_cast<HandledType*>(msg)) {
+            _hnd();
             return true;
         }
 
@@ -180,15 +180,15 @@ public:
 
 protected:
     void disable(const TypeSet<> &handlerTypes) override {
-        disabled = handlerTypes.contains<T>();
+        _disabled = handlerTypes.contains<T>();
         MessageHandler<>::disable(handlerTypes);
     }
 
 protected:
-    std::function<void()> hnd;
+    std::function<void()> _hnd;
 
 private:
-    bool disabled = false;
+    bool _disabled = false;
 };
 
 
@@ -204,9 +204,8 @@ public:
         MessageHandler<Ts...>(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const Message *msg) override {
-        if(!disabled && dynamic_cast<HandledType*>(msg)) {
-//            hnd();                    // error - why I must use MessageHandler<Ts...>::hnd(); instead?
-            MessageHandler<Ts...>::hnd();
+        if(!_disabled && dynamic_cast<HandledType*>(msg)) {
+            MessageHandler<Ts...>::_hnd();
             return true;
         }
 
@@ -215,12 +214,12 @@ public:
 
 protected:
     void disable(const TypeSet<> &handlerTypes) override {
-        disabled = handlerTypes.contains<T>();
+        _disabled = handlerTypes.contains<T>();
         MessageHandler<Ts...>::disable(handlerTypes);
     }
 
 private:
-    bool disabled = false;
+    bool _disabled = false;
 };
 
 
@@ -228,6 +227,6 @@ private:
 } // namespace uau
 
 
-#endif // UAU_AMF_IMPL_MESSAGE_HANDLER_H
+#endif // LIBUAU_AMF_MESSAGE_HANDLER_H
 
 

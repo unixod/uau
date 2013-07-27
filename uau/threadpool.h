@@ -36,19 +36,17 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef THREADPOOL_H
-#define THREADPOOL_H
+#ifndef LIBUAU_THREADPOOL_H
+#define LIBUAU_THREADPOOL_H
 
 
-#include <atomic>
-#include <thread>
-#include <vector>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
+#include <memory>
 
 
 namespace uau {
+
+
+class BlockingThreadPoolPrivate;
 
 
 /**
@@ -95,84 +93,35 @@ namespace uau {
   @endcode
 */
 class BlockingThreadPool {
+    typedef std::function<void()> Task;
+
 public:
-    BlockingThreadPool(int i) : inProgress(0), exit(false) {
-        while(i--)
-            ths.emplace_back(std::thread(&BlockingThreadPool::threadMain, this));
-    }
+    BlockingThreadPool(int i);
 
-    ~BlockingThreadPool() {
-        std::unique_lock<std::mutex> lck(mtx);
-
-        exit = true;
-        full.notify_all();
-        lck.unlock();
-
-        for(auto &t : ths)
-            t.join();
-    }
+    ~BlockingThreadPool();
 
     template<typename Callable, typename... Args>
     void operator()(Callable &&f, Args&&... args) {
         auto task = std::bind(std::forward<Callable>(f), std::forward<Args>(args)...);
-        if(!ths.empty()) {
-            std::unique_lock<std::mutex> lck(mtx);
-            tasks.push(task);
-            full.notify_all();  //in theory full.notify_one(); is better, but in practic the opposit, why???
-        } else {
-            task();
-        }
+        addTask(std::move(task));
     }
 
-    void wait() {
-        std::unique_lock<std::mutex> lck(mtx);
-        empty.wait(lck, [this]{
-            return ths.empty() || (tasks.empty() && !inProgress);
-        });
-    }
+    void wait();
 
 private:
-    void threadMain() {
-        for(;;) {
-            std::unique_lock<std::mutex> lck(mtx);
+    void threadMain();
+    inline void addTask(Task &&);
 
-            empty.notify_all();
-
-            full.wait(lck, [this]{return exit || !tasks.empty();});
-            if(exit) break;
-
-            Task task = tasks.front();
-            tasks.pop();
-
-            lck.unlock();
-
-            ++inProgress;
-
-            try{
-                task();
-            } catch (...) {}
-
-            --inProgress;
-        }
-    }
-
-private:
-    std::atomic<int> inProgress;
-    std::mutex mtx;
-    std::condition_variable  full;
-    std::condition_variable  empty;
-
-    typedef std::function<void()> Task;
-    std::queue<Task> tasks;
-    volatile bool exit;
-
-    std::vector<std::thread> ths;
+protected:
+    friend class BlockingThreadPoolPrivate;
+    BlockingThreadPool(std::unique_ptr<BlockingThreadPoolPrivate>);
+    std::unique_ptr<BlockingThreadPoolPrivate> d_ptr;
 };
 
 
-} //namespace uau
+} // namespace uau
 
 
-#endif // THREADPOOL_H
+#endif // LIBUAU_THREADPOOL_H
 
 

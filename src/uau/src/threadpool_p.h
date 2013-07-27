@@ -36,36 +36,37 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_NODE_H
-#define LIBUAU_AMF_NODE_H
+#ifndef LIBUAU_THREADPOOL_PRIVATE_H
+#define LIBUAU_THREADPOOL_PRIVATE_H
 
 
-#include <string>
-#include <memory>
+#include <atomic>
+#include <thread>
+#include <vector>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include "threadpool.h"
 
 
 namespace uau {
-namespace amf {
 
 
-class Router;
-class Dispatcher;
-
-
-class Node{
+class BlockingThreadPoolPrivate {
 public:
-    template<class T, class... Args>
-    void makeActor(const std::string &/*actorName*/, Args... args);
-
-    void installRouter(std::unique_ptr<Router>);
-    void installDispatcher(std::unique_ptr<Dispatcher>);
+    std::atomic<int> inProgress;
+    std::condition_variable  empty;
+    volatile bool exit;
+    std::mutex mtx;
+    std::condition_variable  full;
+    std::queue<BlockingThreadPool::Task> tasks;
+    std::vector<std::thread> ths;
 };
 
 
-} // namespace amf
-} // namespace uau
+} //namespace uau
 
 
-#endif // LIBUAU_AMF_NODE_H
+#endif // LIBUAU_THREADPOOL_PRIVATE_H
 
 
