@@ -58,6 +58,7 @@ public:
     class Id;
 
     Id id() const;                              /*concurrent*/
+    bool pendingForDeletion() const noexcept;   /*concurrent*/
 
     std::shared_ptr<Message> popFromOutput();   /*concurrent*/
     void pushToInput(std::shared_ptr<Message>); /*concurrent*/

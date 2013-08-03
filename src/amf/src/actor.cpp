@@ -39,5 +39,10 @@ std::weak_ptr<const uau::amf::Message> uau::amf::Actor::message() const {
 }
 
 void uau::amf::Actor::deleteLater() {
-    // TODO: implement
+    d_ptr->pendingForDeletion = true;
+}
+
+
+bool uau::amf::Actor::pendingForDeletion() const noexcept {
+    return d_ptr->pendingForDeletion;
 }

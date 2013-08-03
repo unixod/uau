@@ -42,6 +42,7 @@
 
 #include "message_queue.h"
 #include "message.h"
+#include <atomic>
 
 
 namespace uau {
@@ -53,6 +54,7 @@ public:
     MessageQueue inputQueue;
     MessageQueue outputQueue;
     std::shared_ptr<const Message> message;
+    std::atomic<bool> pendingForDeletion;
 };
 
 
