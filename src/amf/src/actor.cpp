@@ -25,8 +25,23 @@ void uau::amf::Actor::activate() {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
         uau::amf::MessageHandler<> h = std::move(_handler);
 
-        if(not h.handle(d_ptr->message.get()))
+        if(not h.handle(d_ptr->message.get())) {
             _handler = std::move(h);
+        }
+    }
+}
+
+void uau::amf::Actor::tryActivate() {
+    if(_handler.empty()) {           // actor in final state
+        deleteLater();
+    } else {
+        if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
+            uau::amf::MessageHandler<> h = std::move(_handler);
+
+            if(not h.handle(d_ptr->message.get())) {
+                _handler = std::move(h);
+            }
+        }
     }
 }
 

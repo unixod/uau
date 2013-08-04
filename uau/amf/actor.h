@@ -63,7 +63,8 @@ public:
     std::shared_ptr<Message> popFromOutput();   /*concurrent*/
     void pushToInput(std::shared_ptr<Message>); /*concurrent*/
 
-    void activate();
+    void activate();                            // blocks the current thread until the input queue is empty
+    void tryActivate();
 
     virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
 

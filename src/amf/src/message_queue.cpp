@@ -21,3 +21,16 @@ std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::waitAndPop() {
 
     return msg;
 }
+
+std::shared_ptr<uau::amf::Message> uau::amf::MessageQueue::tryPop() {
+    std::lock_guard<std::mutex> lck(_mx);
+
+    std::shared_ptr<Message> msg;
+
+    if(!_q.empty()) {
+        msg = std::move(_q.front());
+        _q.pop();
+    }
+
+    return msg;
+}
