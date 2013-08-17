@@ -10,11 +10,11 @@ uau::amf::Actor::Actor(std::unique_ptr<uau::amf::ActorPrivate> d) :
 
 uau::amf::Actor::~Actor() {}
 
-inline std::shared_ptr<uau::amf::Message> uau::amf::Actor::popFromOutput() {
+std::shared_ptr<uau::amf::Message> uau::amf::Actor::popFromOutput() {
     return d_ptr->outputQueue.waitAndPop();
 }
 
-inline void uau::amf::Actor::pushToInput(std::shared_ptr<Message> msg) {
+void uau::amf::Actor::pushToInput(std::shared_ptr<Message> msg) {
     d_ptr->inputQueue.push(msg);
 }
 
@@ -49,7 +49,7 @@ void uau::amf::Actor::send(std::unique_ptr<uau::amf::Message> msg) {
     d_ptr->outputQueue.push(std::move(msg));
 }
 
-std::weak_ptr<const uau::amf::Message> uau::amf::Actor::message() const {
+std::shared_ptr<const uau::amf::Message> uau::amf::Actor::message() const {
     return d_ptr->message;
 }
 

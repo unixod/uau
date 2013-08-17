@@ -88,7 +88,7 @@ protected:
      * @brief get received message
      * @return received message
      */
-    std::weak_ptr<const Message> message() const;
+    std::shared_ptr<const Message> message() const;
 
 private:
     /**

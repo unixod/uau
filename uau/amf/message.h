@@ -40,11 +40,23 @@
 #define LIBUAU_AMF_MESSAGE_H
 
 
+#include <type_traits>
+
+
 namespace uau {
 namespace amf {
 
 
 struct Message {
+    template<class Msg>
+    bool is() const noexcept {
+        return dynamic_cast<
+                    typename std::add_pointer<
+                        typename std::add_const<Msg>::type
+                    >::type
+                >(this);
+    }
+
     virtual ~Message() {}
 };
 

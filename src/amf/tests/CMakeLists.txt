@@ -12,6 +12,6 @@ include_directories(
 find_package(Threads)
 addTest("uau::amf::MessageQueue" message_queue amf ${CMAKE_THREAD_LIBS_INIT})
 
-addTest("uau::amf::Actor" actor amf)
+addTest("uau::amf::Actor" actor amf ${CMAKE_THREAD_LIBS_INIT})
 addTest("uau::amf::MessageHandler" message_handler amf)
 
