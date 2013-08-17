@@ -101,7 +101,7 @@ const lest::test specification[] = {
         result.pop_back();
         result.erase(0, 1);
         EXPECT(result.find('A') == std::string::npos);
-        EXPECT(result.empty() || result.compare(std::string("B", result.size())));
+        EXPECT(result.empty() || (result.compare(std::string(result.size(), 'B')) == 0));
     }
 };
 
