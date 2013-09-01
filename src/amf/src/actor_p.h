@@ -66,5 +66,3 @@ public:
 
 
 #endif // LIBUAU_AMF_ACTOR_PRIVATE_H
-
-

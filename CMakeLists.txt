@@ -32,7 +32,7 @@ set(LIBUAU_INCLUDE_DIR
     "${CMAKE_SOURCE_DIR}/include")
 
 set(3RDPARTY_LIB_DIR
-    "${CMAKE_SOURCE_DIR}/lib")
+    "${CMAKE_SOURCE_DIR}/libs")
 
 add_subdirectory(src)
 
