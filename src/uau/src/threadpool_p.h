@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_THREADPOOL_PRIVATE_H
-#define LIBUAU_THREADPOOL_PRIVATE_H
+#ifndef UAU_THREADPOOL_PRIVATE_H
+#define UAU_THREADPOOL_PRIVATE_H
 
 
 #include <atomic>
@@ -67,6 +67,4 @@ public:
 } //namespace uau
 
 
-#endif // LIBUAU_THREADPOOL_PRIVATE_H
-
-
+#endif // UAU_THREADPOOL_PRIVATE_H

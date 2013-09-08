@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_ACTOR_H
-#define LIBUAU_AMF_ACTOR_H
+#ifndef UAU_AMF_ACTOR_H
+#define UAU_AMF_ACTOR_H
 
 
 #include <memory>
@@ -110,6 +110,4 @@ protected:
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_ACTOR_H
-
-
+#endif // UAU_AMF_ACTOR_H

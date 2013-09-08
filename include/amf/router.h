@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_ROUTER_H
-#define LIBUAU_AMF_ROUTER_H
+#ifndef UAU_AMF_ROUTER_H
+#define UAU_AMF_ROUTER_H
 
 
 #include <vector>
@@ -60,6 +60,4 @@ public:
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_ROUTER_H
-
-
+#endif // UAU_AMF_ROUTER_H

@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_DISPATCHER_H
-#define LIBUAU_AMF_DISPATCHER_H
+#ifndef UAU_AMF_DISPATCHER_H
+#define UAU_AMF_DISPATCHER_H
 
 
 namespace uau {
@@ -56,6 +56,4 @@ public:
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_DISPATCHER_H
-
-
+#endif // UAU_AMF_DISPATCHER_H

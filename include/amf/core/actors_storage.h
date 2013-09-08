@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_CORE_ACTORS_STORAGE_H
-#define LIBUAU_AMF_CORE_ACTORS_STORAGE_H
+#ifndef UAU_AMF_CORE_ACTORS_STORAGE_H
+#define UAU_AMF_CORE_ACTORS_STORAGE_H
 
 
 #include "actors_db.h"
@@ -45,6 +45,7 @@
 
 namespace uau {
 namespace amf {
+namespace core {
 
 
 class ActorsStorage : public ActorsDB {
@@ -54,10 +55,9 @@ public:
 };
 
 
+} // namesace core
 } // namespace amf
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_CORE_ACTORS_STORAGE_H
-
-
+#endif // UAU_AMF_CORE_ACTORS_STORAGE_H

@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_CORE_MAIN_ROUTER_H
-#define LIBUAU_AMF_CORE_MAIN_ROUTER_H
+#ifndef UAU_AMF_CORE_MAIN_ROUTER_H
+#define UAU_AMF_CORE_MAIN_ROUTER_H
 
 
 #include "router.h"
@@ -45,6 +45,7 @@
 
 namespace uau {
 namespace amf {
+namespace core {
 
 
 class MainRouter : public Router {
@@ -54,8 +55,9 @@ public:
 };
 
 
+} // namespace core
 } // namespace amf
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_CORE_MAIN_ROUTER_H
+#endif // UAU_AMF_CORE_MAIN_ROUTER_H

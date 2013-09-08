@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_RANGESET_H
-#define LIBUAU_RANGESET_H
+#ifndef UAU_RANGESET_H
+#define UAU_RANGESET_H
 
 
 #include <list>
@@ -132,4 +132,4 @@ void RangeSet<T, Sequence>::exclude(T min, T max) {
 } //namespace uau
 
 
-#endif // LIBUAU_RANGESET_H
+#endif // UAU_RANGESET_H

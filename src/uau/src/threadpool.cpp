@@ -67,4 +67,3 @@ void uau::BlockingThreadPool::addTask(uau::BlockingThreadPool::Task &&task) {
         task();
     }
 }
-

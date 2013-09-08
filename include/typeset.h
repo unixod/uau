@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_TYPESET_H
-#define LIBUAU_TYPESET_H
+#ifndef UAU_TYPESET_H
+#define UAU_TYPESET_H
 
 
 namespace uau {
@@ -108,5 +108,3 @@ class TypeSet<T, Ts...> : private TypeSet<Ts...>, public TypeSet<T> {};
 
 
 #endif // UAU_TYPESET_H
-
-
