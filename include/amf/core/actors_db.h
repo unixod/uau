@@ -65,5 +65,3 @@ public:
 
 
 #endif // LIBUAU_AMF_CORE_ACTORS_DB_H
-
-

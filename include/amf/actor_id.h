@@ -36,26 +36,25 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef LIBUAU_AMF_CORE_MAIN_ROUTER_H
-#define LIBUAU_AMF_CORE_MAIN_ROUTER_H
+#ifndef LIBUAU_AMF_ACTOR_ID_H
+#define LIBUAU_AMF_ACTOR_ID_H
 
 
-#include "router.h"
+#include <type_traits>
+#include "actor.h"
 
 
 namespace uau {
 namespace amf {
 
 
-class MainRouter : public Router {
-public:
-    void addRouter(std::unique_ptr<Router>);
-    std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<Message>) override;
-};
+class Actor::Id {};
 
 
 } // namespace amf
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_CORE_MAIN_ROUTER_H
+#endif // LIBUAU_AMF_MESSAGE_H
+
+
