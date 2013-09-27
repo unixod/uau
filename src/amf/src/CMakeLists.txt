@@ -10,6 +10,7 @@ include_directories(
 set(LIBUAU_AMF_SOURCES
     node.cpp
     actor.cpp
+    actor_id.cpp
     message_queue.cpp
     "${LIBUAU_AMF_SOURCE_DIR}/core/actors_storage.cpp"
     "${LIBUAU_AMF_SOURCE_DIR}/core/main_router.cpp")

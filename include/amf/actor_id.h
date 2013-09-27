@@ -40,6 +40,7 @@
 #define UAU_AMF_ACTOR_ID_H
 
 
+#include <string>
 #include "actor.h"
 
 
@@ -47,7 +48,10 @@ namespace uau {
 namespace amf {
 
 
-class Actor::Id {};
+class Actor::Id {
+public:
+    Id(const std::string &);
+};
 
 
 } // namespace amf
