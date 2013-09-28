@@ -1,3 +1,4 @@
+project(uau)
 cmake_minimum_required(VERSION 2.8)
 
 include_directories(
@@ -8,5 +9,9 @@ set(LIBUAU_SOURCES
 
 add_library(${PROJECT_NAME} ${LIBUAU_SOURCES})
 
+find_package(Threads)
+target_link_libraries(${PROJECT_NAME}
+    ${CMAKE_THREAD_LIBS_INIT})
+
 showFilesInIDE(
-    "${LIBUAU_SOURCE_DIR}/threadpool_p.h")
+    threadpool_p.h)

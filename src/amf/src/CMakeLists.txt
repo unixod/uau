@@ -12,12 +12,12 @@ set(LIBUAU_AMF_SOURCES
     actor.cpp
     actor_id.cpp
     message_queue.cpp
-    "${LIBUAU_AMF_SOURCE_DIR}/core/actors_storage.cpp"
-    "${LIBUAU_AMF_SOURCE_DIR}/core/main_router.cpp")
+    "core/actors_storage.cpp"
+    "core/main_router.cpp")
 
 add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
 showFilesInIDE(
-    "${LIBUAU_AMF_SOURCE_DIR}/actor_p.h"
-    "${LIBUAU_AMF_SOURCE_DIR}/message_handler.h"
-    "${LIBUAU_AMF_SOURCE_DIR}/message_queue.h")
+    actor_p.h
+    message_handler.h
+    message_queue.h)
