@@ -96,7 +96,7 @@ private:
 
 protected:
     Actor();                                    // this class is abstract
-    MessageHandler<> _handler;
+    TypedActionMap<Message> _handler;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);

@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_MESSAGE_HANDLER_H
-#define UAU_AMF_MESSAGE_HANDLER_H
+#ifndef UAU_AMF_TYPED_ACTION_MAP_H
+#define UAU_AMF_TYPED_ACTION_MAP_H
 
 
 #include <vector>
@@ -49,21 +49,19 @@ namespace uau {
 namespace amf {
 
 
-class Message;
-
-
 /**
-  @brief Message handler
+  @brief Map of typed actions
 
   Usage:
   @code
-    class Msg1 : public uau::amf::Message {...};
-    class Msg2 : public uau::amf::Message {...};
-    class Msg3 : public uau::amf::Message {...};
-    class Msg4 : public uau::amf::Message {...};
-    class Msg5 : public uau::amf::Message {...};
-    class Msg6 : public uau::amf::Message {...};
+    class Msg1 : public SomeBase {...};
+    class Msg2 : public SomeBase {...};
+    class Msg3 : public SomeBase {...};
+    class Msg4 : public SomeBase {...};
+    class Msg5 : public SomeBase {...};
+    class Msg6 : public SomeBase {...};
 
+    // actions
     void someHandler() {
         ...
     }
@@ -84,9 +82,9 @@ class Message;
     };
 
     void func() {
-        MessageHandler<> handler;
+        TypedActionMap<SomeBase> handler;
 
-        // setup handlers
+        // setup actions
         handler.setHandlerFor<Msg1>(someHandler);
         handler.setHandlerFor<Msg2>(someOtherHandler, 1, "second");
         SomeClass foo;
@@ -95,45 +93,46 @@ class Message;
 
 
         // handling
-        Message *msg;
+        std::unique_ptr<SomeBase> msg(new Msg1);
+        handler.handle(msg.get());    // someHandler()
 
-        msg = new Msg1;
-        handler.handle(msg);    // someHandler()
+        msg.reset(new Msg2);
+        handler.handle(msg.get());    // someOtherHandler(1, "second")
 
-        msg = new Msg2;
-        handler.handle(msg);    // someOtherHandler(1, "second")
+        msg.reset(new Msg3);
+        handler.handle(msg.get());    // foo.handler(params...)
 
-        msg = new Msg3;
-        handler.handle(msg);    // foo.handler(params...)
+        msg.reset(new Msg4);
+        handler.handle(msg.get());    // multiHandler()
 
-        msg = new Msg4;
-        handler.handle(msg);    // multiHandler()
+        msg.reset(new Msg5);
+        handler.handle(msg.get());    // multiHandler()
 
-        msg = new Msg5;
-        handler.handle(msg);    // multiHandler()
-
-        msg = new Msg6;
-        handler.handle(msg);    // multiHandler()
+        msg.reset(new Msg6);
+        handler.handle(msg.get());    // multiHandler()
     }
   @endcode
 */
 template<class...>
-class MessageHandler {
+class TypedActionMap;
+
+template<class BaseType>
+class TypedActionMap<BaseType> {
 public:
-    constexpr MessageHandler() noexcept = default;
+    constexpr TypedActionMap() noexcept = default;
 
-    MessageHandler(MessageHandler &&) noexcept = default;
+    TypedActionMap(TypedActionMap &&) noexcept = default;
 
-    MessageHandler & operator = (MessageHandler &&) noexcept = default;
+    TypedActionMap & operator = (TypedActionMap &&) noexcept = default;
 
-    virtual ~MessageHandler() {}
+    virtual ~TypedActionMap() {}
 
 
     bool empty() const noexcept {
         return _next == nullptr;
     }
 
-    virtual bool handle(const Message *msg) {
+    virtual bool handle(const BaseType *msg) {
         return _next ? _next->handle(msg) : false;
     }
 
@@ -144,7 +143,7 @@ public:
         if(_next)
             _next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
         else
-            _next.reset(new MessageHandler<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
+            _next.reset(new TypedActionMap<BaseType, Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
     }
 
 protected:
@@ -154,34 +153,36 @@ protected:
     }
 
 private:
-    std::unique_ptr<MessageHandler<>> _next;
+    std::unique_ptr<TypedActionMap<BaseType>> _next;
 };
 
 
-template<class T>
-class MessageHandler<T> : public MessageHandler<> {
+template<class BaseType, class T>
+class TypedActionMap<BaseType, T> : public TypedActionMap<BaseType> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
+    typedef TypedActionMap<BaseType> Parent;
+
 public:
     template<class Callable, class... Args>
-    MessageHandler(Callable &&f, Args&&... args) :
+    TypedActionMap(Callable &&f, Args&&... args) :
         _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(const Message *msg) override {
+    bool handle(const BaseType *msg) override {
         if(!_disabled && dynamic_cast<HandledType*>(msg)) {
             _hnd();
             return true;
         }
 
-        return MessageHandler<>::handle(msg);
+        return Parent::handle(msg);
     }
 
 protected:
     void disable(const TypeSet<> &handlerTypes) override {
         _disabled = handlerTypes.contains<T>();
-        MessageHandler<>::disable(handlerTypes);
+        Parent::disable(handlerTypes);
     }
 
 protected:
@@ -192,30 +193,32 @@ private:
 };
 
 
-template<class T, class... Ts>
-class MessageHandler<T, Ts...> : public MessageHandler<Ts...> {
+template<class BaseType, class T, class... Ts>
+class TypedActionMap<BaseType, T, Ts...> : public TypedActionMap<BaseType, Ts...> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
+    typedef TypedActionMap<BaseType, Ts...> Parent;
+
 public:
     template<class Callable, class... Args>
-    MessageHandler(Callable &&f, Args&&... args) :
-        MessageHandler<Ts...>(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
+    TypedActionMap(Callable &&f, Args&&... args) :
+        Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
-    bool handle(const Message *msg) override {
+    bool handle(const BaseType *msg) override {
         if(!_disabled && dynamic_cast<HandledType*>(msg)) {
-            MessageHandler<Ts...>::_hnd();
+            Parent::_hnd();
             return true;
         }
 
-        return MessageHandler<Ts...>::handle(msg);
+        return Parent::handle(msg);
     }
 
 protected:
     void disable(const TypeSet<> &handlerTypes) override {
         _disabled = handlerTypes.contains<T>();
-        MessageHandler<Ts...>::disable(handlerTypes);
+        Parent::disable(handlerTypes);
     }
 
 private:
@@ -227,4 +230,4 @@ private:
 } // namespace uau
 
 
-#endif // UAU_AMF_MESSAGE_HANDLER_H
+#endif // UAU_AMF_TYPED_ACTION_MAP_H

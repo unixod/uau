@@ -58,7 +58,7 @@ void handlerForMultipleMessages() {
     HandlerName("handlerForMultipleMessages");
 }
 
-uau::amf::MessageHandler<> handler;
+uau::amf::TypedActionMap<uau::amf::Message> handler;
 
 const lest::test specification[] = {
     "Msg1 -> handlerFreeFunc()", []{
@@ -105,13 +105,13 @@ const lest::test specification[] = {
     "move constructor", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::MessageHandler<> h1;
+        uau::amf::TypedActionMap<uau::amf::Message> h1;
         h1.setHandlerFor<Msg1>([]{});
 
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::MessageHandler<> h2 = std::move(h1);
+        uau::amf::TypedActionMap<uau::amf::Message> h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
 
@@ -124,13 +124,13 @@ const lest::test specification[] = {
     "move assignment", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::MessageHandler<> h1;
+        uau::amf::TypedActionMap<uau::amf::Message> h1;
         h1.setHandlerFor<Msg1>(handlerFreeFunc);
 
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::MessageHandler<> h2;
+        uau::amf::TypedActionMap<uau::amf::Message> h2;
         h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
@@ -142,7 +142,7 @@ const lest::test specification[] = {
     },
 
     "handlers overriding", []{
-        uau::amf::MessageHandler<> h;
+        uau::amf::TypedActionMap<uau::amf::Message> h;
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
 
         {
