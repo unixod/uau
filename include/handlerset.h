@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_TYPED_ACTION_MAP_H
-#define UAU_AMF_TYPED_ACTION_MAP_H
+#ifndef UAU_HANDLER_SET_H
+#define UAU_HANDLER_SET_H
 
 
 #include <vector>
@@ -46,7 +46,6 @@
 
 
 namespace uau {
-namespace amf {
 
 
 /**
@@ -60,77 +59,89 @@ namespace amf {
     class Msg4 : public SomeBase {...};
     class Msg5 : public SomeBase {...};
     class Msg6 : public SomeBase {...};
+    class Msg7 : public SomeBase {...};
+    class Msg8 : public SomeBase {...};
 
-    // actions
-    void someHandler() {
-        ...
+    // handlers
+    void handlerA() {
+        std::cout << "handlerA() was invoked" << std::endl;
     }
 
-    void someOtherHandler(int param, const std::string &) {
-        ...
+    void handlerB() {
+        std::cout << "handlerB() was invoked" << std::endl;
     }
 
-    void multiHandler(int param, const std::string &) {
-        ...
+    void handlerC(int param, const std::string &str) {
+        std::cout << "handlerC(" << param << ", "  << str << ") was invoked" << std::endl;
+    }
+
+    void handlerD(char ch, const SomeBase *msg, const std::string &str) {
+        if(dynamic_cast<const Msg6 *>(msg))
+            std::cout << "handlerD was invoked" << std::endl;
+        else
+            std::cout << "handlerD was invoked with unexpected message" << std::endl;;
     }
 
     class SomeClass {
     public:
-        void handler(...) {
-            ...
+        void handlerE(...) {
+            std::cout << "SomeClass::handlerE(...) was invoked" << std::endl;
         }
     };
 
     void func() {
-        TypedActionMap<SomeBase> handler;
+        HandlerSet<SomeBase> handlers;
 
-        // setup actions
-        handler.setHandlerFor<Msg1>(someHandler);
-        handler.setHandlerFor<Msg2>(someOtherHandler, 1, "second");
+        // setup handlers
+        handlers.setHandlerFor<Msg1>(handlerA);
+        handlers.setHandlerFor<Msg2, Msg3, Msg4>(handlerB);
+        handlers.setHandlerFor<Msg5>(handlerC, 1, "second");
+        handlers.setHandlerFor<Msg6>(handlerD, 'c', std::placeholders::_1, "arg");
+        // handlers.setHandlerFor<Msg6, Msg7>(handlerD, 'c', std::placeholders::_1, "arg");     // this not implemented yet
         SomeClass foo;
-        handler.setHandlerFor<Msg3>(&SomeClass::handler, &foo, params...);
-        hanedler.setHandlerFor<Msg4, Msg5, Msg6>(multiHandler);
-
+        handlers.setHandlerFor<Msg8>(&SomeClass::handlerE, &foo, ...);
 
         // handling
         std::unique_ptr<SomeBase> msg(new Msg1);
-        handler.handle(msg.get());    // someHandler()
+        handlers.handle(msg.get());    // handlerA() was invoked
 
         msg.reset(new Msg2);
-        handler.handle(msg.get());    // someOtherHandler(1, "second")
+        handlers.handle(msg.get());    // handlerB() was invoked
 
         msg.reset(new Msg3);
-        handler.handle(msg.get());    // foo.handler(params...)
+        handlers.handle(msg.get());    // handlerB() was invoked
 
         msg.reset(new Msg4);
-        handler.handle(msg.get());    // multiHandler()
+        handlers.handle(msg.get());    // handlerB() was invoked
 
         msg.reset(new Msg5);
-        handler.handle(msg.get());    // multiHandler()
+        handlers.handle(msg.get());    // handlerC(1, "second") was invoked
 
         msg.reset(new Msg6);
-        handler.handle(msg.get());    // multiHandler()
+        handlers.handle(msg.get());    // handlerD was invoked
+
+        msg.reset(new Msg7);
+        handlers.handle(msg.get());    // handlerD was invoked with unexpected message
+
+        msg.reset(new Msg8);
+        handlers.handle(msg.get());    // SomeClass::handlerE(...) was invoked
     }
   @endcode
 */
 template<class...>
-class TypedActionMap;
+class HandlerSet;
 
 template<class BaseType>
-class TypedActionMap<BaseType> {
+class HandlerSet<BaseType> {
 public:
-    constexpr TypedActionMap() noexcept = default;
+    constexpr HandlerSet() noexcept = default;
+    HandlerSet(HandlerSet &&) noexcept = default;
 
-    TypedActionMap(TypedActionMap &&) noexcept = default;
+    virtual ~HandlerSet() {}
 
-    TypedActionMap & operator = (TypedActionMap &&) noexcept = default;
+    HandlerSet & operator = (HandlerSet &&) noexcept = default;
 
-    virtual ~TypedActionMap() {}
-
-
-    bool empty() const noexcept {
-        return _next == nullptr;
-    }
+    bool empty() const noexcept { return _next == nullptr; }
 
     virtual bool handle(const BaseType *msg) {
         return _next ? _next->handle(msg) : false;
@@ -143,7 +154,7 @@ public:
         if(_next)
             _next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
         else
-            _next.reset(new TypedActionMap<BaseType, Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
+            _next.reset(new HandlerSet<BaseType, Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
     }
 
 protected:
@@ -153,26 +164,26 @@ protected:
     }
 
 private:
-    std::unique_ptr<TypedActionMap<BaseType>> _next;
+    std::unique_ptr<HandlerSet<BaseType>> _next;
 };
 
 
 template<class BaseType, class T>
-class TypedActionMap<BaseType, T> : public TypedActionMap<BaseType> {
+class HandlerSet<BaseType, T> : public HandlerSet<BaseType> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
-    typedef TypedActionMap<BaseType> Parent;
+    typedef HandlerSet<BaseType> Parent;
 
 public:
     template<class Callable, class... Args>
-    TypedActionMap(Callable &&f, Args&&... args) :
+    HandlerSet(Callable &&f, Args&&... args) :
         _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
         if(!_disabled && dynamic_cast<HandledType*>(msg)) {
-            _hnd();
+            _hnd(msg);
             return true;
         }
 
@@ -186,7 +197,7 @@ protected:
     }
 
 protected:
-    std::function<void()> _hnd;
+    std::function<void(const BaseType *)> _hnd;
 
 private:
     bool _disabled = false;
@@ -194,21 +205,21 @@ private:
 
 
 template<class BaseType, class T, class... Ts>
-class TypedActionMap<BaseType, T, Ts...> : public TypedActionMap<BaseType, Ts...> {
+class HandlerSet<BaseType, T, Ts...> : public HandlerSet<BaseType, Ts...> {
     typedef typename std::add_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
-    typedef TypedActionMap<BaseType, Ts...> Parent;
+    typedef HandlerSet<BaseType, Ts...> Parent;
 
 public:
     template<class Callable, class... Args>
-    TypedActionMap(Callable &&f, Args&&... args) :
+    HandlerSet(Callable &&f, Args&&... args) :
         Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
         if(!_disabled && dynamic_cast<HandledType*>(msg)) {
-            Parent::_hnd();
+            Parent::_hnd(msg);
             return true;
         }
 
@@ -226,8 +237,7 @@ private:
 };
 
 
-} // namespace amf
 } // namespace uau
 
 
-#endif // UAU_AMF_TYPED_ACTION_MAP_H
+#endif // UAU_HANDLER_SET_H

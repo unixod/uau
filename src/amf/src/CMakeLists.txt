@@ -19,5 +19,4 @@ add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
 showFilesInIDE(
     actor_p.h
-    message_handler.h
     message_queue.h)

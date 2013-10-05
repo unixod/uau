@@ -1,5 +1,5 @@
 #include "lest/lest.hpp"
-#include "message_handler.h"
+#include "handlerset.h"
 #include "message.h"
 
 
@@ -58,7 +58,7 @@ void handlerForMultipleMessages() {
     HandlerName("handlerForMultipleMessages");
 }
 
-uau::amf::TypedActionMap<uau::amf::Message> handler;
+uau::HandlerSet<uau::amf::Message> handler;
 
 const lest::test specification[] = {
     "Msg1 -> handlerFreeFunc()", []{
@@ -105,13 +105,13 @@ const lest::test specification[] = {
     "move constructor", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::TypedActionMap<uau::amf::Message> h1;
+        uau::HandlerSet<uau::amf::Message> h1;
         h1.setHandlerFor<Msg1>([]{});
 
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::TypedActionMap<uau::amf::Message> h2 = std::move(h1);
+        uau::HandlerSet<uau::amf::Message> h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
 
@@ -124,13 +124,13 @@ const lest::test specification[] = {
     "move assignment", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::TypedActionMap<uau::amf::Message> h1;
+        uau::HandlerSet<uau::amf::Message> h1;
         h1.setHandlerFor<Msg1>(handlerFreeFunc);
 
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::TypedActionMap<uau::amf::Message> h2;
+        uau::HandlerSet<uau::amf::Message> h2;
         h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
@@ -142,7 +142,7 @@ const lest::test specification[] = {
     },
 
     "handlers overriding", []{
-        uau::amf::TypedActionMap<uau::amf::Message> h;
+        uau::HandlerSet<uau::amf::Message> h;
         std::unique_ptr<uau::amf::Message> msg(new Msg1);
 
         {
@@ -159,6 +159,20 @@ const lest::test specification[] = {
             EXPECT(h.handle(msg.get()));
             EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
         }
+    },
+
+    "message passing", [] {
+        uau::HandlerSet<uau::amf::Message> actions;
+
+        actions.setHandlerFor<Msg1>([](const uau::amf::Message *b){
+            EXPECT(dynamic_cast<const Msg1 *>(b));
+        }, std::placeholders::_1);
+
+        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        EXPECT(actions.handle(msg.get()));
+
+        msg.reset(new Msg2);
+        EXPECT(!actions.handle(msg.get()));
     }
 };
 

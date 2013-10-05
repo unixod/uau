@@ -23,7 +23,7 @@ void uau::amf::Actor::activate() {
         deleteLater();
     } else {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
-        uau::amf::TypedActionMap<Message> h = std::move(_handler);
+        HandlerSet<Message> h = std::move(_handler);
 
         if(not h.handle(d_ptr->message.get())) {
             _handler = std::move(h);
@@ -36,7 +36,7 @@ void uau::amf::Actor::tryActivate() {
         deleteLater();
     } else {
         if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
-            uau::amf::TypedActionMap<Message> h = std::move(_handler);
+            HandlerSet<Message> h = std::move(_handler);
 
             if(not h.handle(d_ptr->message.get())) {
                 _handler = std::move(h);

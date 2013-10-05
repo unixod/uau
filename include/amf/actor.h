@@ -42,7 +42,7 @@
 
 #include <memory>
 #include <functional>
-#include "message_handler.h"
+#include "handlerset.h"
 
 
 namespace uau {
@@ -96,7 +96,7 @@ private:
 
 protected:
     Actor();                                    // this class is abstract
-    TypedActionMap<Message> _handler;
+    HandlerSet<Message> _handler;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);
