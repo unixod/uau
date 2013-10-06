@@ -37,6 +37,7 @@ add_subdirectory(src)
 
 showFilesInIDE(
     "${LIBUAU_INCLUDE_DIR}/concurrency_algo.h"
+    "${LIBUAU_INCLUDE_DIR}/amf/core/envelope.h"
     "${LIBUAU_INCLUDE_DIR}/handlerset.h"
     "${LIBUAU_INCLUDE_DIR}/rangeset.h"
     "${LIBUAU_INCLUDE_DIR}/threadpool.h"
