@@ -45,7 +45,10 @@ namespace amf {
 namespace core {
 
 template<class...>
-class Envelope{};
+class Envelope{
+public:
+    virtual ~Envelop() {}
+};
 
 template<class Message>
 class Envelope<Message> : public Envelope<> {
