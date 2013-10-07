@@ -40,6 +40,9 @@
 #define UAU_AMF_CORE_ENVELOPE_H
 
 
+#include <type_traits>
+
+
 namespace uau {
 namespace amf {
 namespace core {
@@ -47,7 +50,18 @@ namespace core {
 template<class...>
 class Envelope{
 public:
-    virtual ~Envelop() {}
+    template<class T>
+    bool is() const {
+        return dynamic_cast<
+                    const Envelope<
+                        typename std::add_const<
+                            typename std::add_pointer<T>::type
+                        >::type
+                    > *
+                >(this);
+    }
+
+    virtual ~Envelope() {}
 };
 
 template<class Message>

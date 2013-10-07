@@ -36,36 +36,21 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_MESSAGE_QUEUE_H
-#define UAU_AMF_MESSAGE_QUEUE_H
-
-
-#include <memory>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
-#include "core/envelope_fwd.h"
+#ifndef UAU_AMF_CORE_ENVELOPE_FWD_H
+#define UAU_AMF_CORE_ENVELOPE_FWD_H
 
 
 namespace uau {
 namespace amf {
+namespace core {
+
+template<class...>
+class Envelope;
 
 
-class MessageQueue {
-public:
-    void push(std::shared_ptr<core::Envelope<>> msg);            /*concurrent*/
-    std::shared_ptr<core::Envelope<>> waitAndPop();              /*concurrent*/
-    std::shared_ptr<core::Envelope<>> tryPop();
-
-private:
-    std::queue<std::shared_ptr<core::Envelope<>>> _q;
-    mutable std::mutex _mx;
-    mutable std::condition_variable _cond;
-};
-
-
+} // namespace core
 } // namespace amf
 } // namespace uau
 
 
-#endif // LIBUAU_AMF_MESSAGE_QUEUE_H
+#endif // UAU_AMF_CORE_ENVELOPE_FWD_H

@@ -170,7 +170,7 @@ private:
 
 template<class BaseType, class T>
 class HandlerSet<BaseType, T> : public HandlerSet<BaseType> {
-    typedef typename std::add_const<
+    typedef typename std::remove_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
@@ -182,7 +182,7 @@ public:
         _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<HandledType*>(msg)) {
+        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
             _hnd(msg);
             return true;
         }
@@ -206,7 +206,7 @@ private:
 
 template<class BaseType, class T, class... Ts>
 class HandlerSet<BaseType, T, Ts...> : public HandlerSet<BaseType, Ts...> {
-    typedef typename std::add_const<
+    typedef typename std::remove_const<
         typename std::remove_pointer<T>::type
     >::type HandledType;
 
@@ -218,7 +218,7 @@ public:
         Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<HandledType*>(msg)) {
+        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
             Parent::_hnd(msg);
             return true;
         }

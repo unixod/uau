@@ -1,10 +1,11 @@
-#include "lest/lest.hpp"
-#include "actor.h"
-#include "message.h"
 #include <string>
 #include <future>
 #include <random>
 #include <deque>
+#include "lest/lest.hpp"
+#include "actor.h"
+#include "core/envelope.h"
+#include "message.h"
 
 
 class Msg1 : public uau::amf::Message {};

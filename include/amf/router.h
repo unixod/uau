@@ -50,7 +50,7 @@ namespace amf {
 
 class Router {
 public:
-    virtual std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<Message>) = 0;  /*concurrent*/
+    virtual std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<core::Envelope<>>) = 0;  /*concurrent*/
 
     virtual ~Router() {}
 };

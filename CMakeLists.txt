@@ -20,7 +20,8 @@ set(CMAKE_MODULE_PATH
 #===============================================================================
 include(configCXX)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBUAU_WALL_FLAG} ${LIBUAU_CXX11_FLAG}")
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} ${LIBUAU_WALL_FLAG} ${LIBUAU_CXX11_FLAG}")
 
 #===============================================================================
 # Setup project
@@ -38,6 +39,7 @@ add_subdirectory(src)
 showFilesInIDE(
     "${LIBUAU_INCLUDE_DIR}/concurrency_algo.h"
     "${LIBUAU_INCLUDE_DIR}/amf/core/envelope.h"
+    "${LIBUAU_INCLUDE_DIR}/amf/core/envelope_fwd.h"
     "${LIBUAU_INCLUDE_DIR}/handlerset.h"
     "${LIBUAU_INCLUDE_DIR}/rangeset.h"
     "${LIBUAU_INCLUDE_DIR}/threadpool.h"

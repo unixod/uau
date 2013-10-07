@@ -42,6 +42,7 @@
 
 #include <memory>
 #include <functional>
+#include "core/envelope.h"
 #include "handlerset.h"
 
 
@@ -49,7 +50,6 @@ namespace uau {
 namespace amf {
 
 
-class Message;
 class ActorPrivate;
 
 
@@ -60,8 +60,8 @@ public:
     Id id() const;                              /*concurrent*/
     bool pendingForDeletion() const noexcept;   /*concurrent*/
 
-    std::shared_ptr<Message> popFromOutput();   /*concurrent*/
-    void pushToInput(std::shared_ptr<Message>); /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput();   /*concurrent*/
+    void pushToInput(std::shared_ptr<core::Envelope<>>); /*concurrent*/
 
     void activate();                            // blocks the current thread until the input queue is empty
     void tryActivate();
@@ -71,22 +71,22 @@ public:
 protected:
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
     void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
-        _handler.setHandlerFor<Msgs...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
+        _handler.setHandlerFor<core::Envelope<Msgs>...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
     }
 
     template<class... Msgs, class Callable, class... Args>
     typename std::enable_if<not std::is_member_function_pointer<Callable>::value>::type
     on(Callable &&f, Args&&... args) {
-        _handler.setHandlerFor<Msgs...>(std::forward<Callable>(f), std::forward<Args>(args)...);
+        _handler.setHandlerFor<core::Envelope<Msgs>...>(std::forward<Callable>(f), std::forward<Args>(args)...);
     }
 
-    void send(std::unique_ptr<Message>);
+    void send(std::unique_ptr<core::Envelope<>>);
 
     /**
      * @brief get received message
      * @return received message
      */
-    std::shared_ptr<const Message> message() const;
+    std::shared_ptr<const core::Envelope<>> message() const;
 
 private:
     /**
@@ -96,7 +96,7 @@ private:
 
 protected:
     Actor();                                    // this class is abstract
-    HandlerSet<Message> _handler;
+    HandlerSet<core::Envelope<>> _handler;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);

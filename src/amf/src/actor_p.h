@@ -40,9 +40,9 @@
 #define UAU_AMF_ACTOR_PRIVATE_H
 
 
-#include "message_queue.h"
-#include "message.h"
 #include <atomic>
+#include "core/envelope.h"
+#include "message_queue.h"
 
 
 namespace uau {
@@ -56,7 +56,7 @@ public:
 
     MessageQueue inputQueue;
     MessageQueue outputQueue;
-    std::shared_ptr<const Message> message;
+    std::shared_ptr<const core::Envelope<>> message;
     std::atomic<bool> pendingForDeletion;
 };
 
