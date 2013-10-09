@@ -80,7 +80,12 @@ protected:
         _handler.setHandlerFor<core::Envelope<Msgs>...>(std::forward<Callable>(f), std::forward<Args>(args)...);
     }
 
-    void send(std::unique_ptr<core::Envelope<>>);
+    template<class T>
+    void send(T &&message) {
+        // FIXME: since C++14 use std::make_unique
+        std::unique_ptr<core::Envelope<T>> envelope{new core::Envelope<T>{std::forward<T>(message)}};
+        sendEnvelope(std::move(envelope));
+    }
 
     /**
      * @brief get received message
@@ -93,6 +98,8 @@ private:
      * @brief Schedule this actor for deletion
      */
     void deleteLater();
+    void sendEnvelope(std::unique_ptr<core::Envelope<>>);
+
 
 protected:
     Actor();                                    // this class is abstract

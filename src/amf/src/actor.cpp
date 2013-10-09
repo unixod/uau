@@ -49,16 +49,16 @@ void amf::Actor::tryActivate() {
     }
 }
 
-void amf::Actor::send(std::unique_ptr<core::Envelope<> > msg) {
-    d_ptr->outputQueue.push(std::move(msg));
-}
-
 std::shared_ptr<const core::Envelope<>> amf::Actor::message() const {
     return d_ptr->message;
 }
 
 void amf::Actor::deleteLater() {
     d_ptr->pendingForDeletion = true;
+}
+
+void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg) {
+  d_ptr->outputQueue.push(std::move(msg));
 }
 
 bool amf::Actor::pendingForDeletion() const noexcept {
