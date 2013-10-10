@@ -70,6 +70,14 @@ public:
     Envelope(Message&& msg) :
         _message(msg) {}
 
+    Message & message() {
+        return _message;
+    }
+
+    const Message & message() const {
+        return _message;
+    }
+
 private:
     Message _message;
 };
