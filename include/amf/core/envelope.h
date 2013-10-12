@@ -53,12 +53,16 @@ public:
     template<class T>
     bool is() const {
         return dynamic_cast<
-                    const Envelope<
-                        typename std::add_const<
-                            typename std::add_pointer<T>::type
-                        >::type
-                    > *
-                >(this);
+                typename std::add_pointer<
+                    typename std::add_const<
+                        Envelope<
+                            typename std::add_pointer<
+                                typename std::add_const<T>::type
+                            >::type
+                        >
+                    >::type
+                >::type
+               >(this);
     }
 
     virtual ~Envelope() {}
@@ -67,6 +71,13 @@ public:
 template<class Message>
 class Envelope<Message> : public Envelope<> {
 public:
+    Envelope() = default;
+    Envelope(const Envelope &) = default;
+    Envelope(Envelope &&) = default;
+
+    Envelope & operator = (const Envelope &) = default;
+    Envelope & operator = (Envelope &&) = default;
+
     Envelope(Message&& msg) :
         _message(msg) {}
 
