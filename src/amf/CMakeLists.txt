@@ -16,7 +16,6 @@ showFilesInIDE(
     "${LIBUAU_AMF_INCLUDE_DIR}/actor.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/actor_id.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/dispatcher.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/message.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/node.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/router.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/actors_db.h"
