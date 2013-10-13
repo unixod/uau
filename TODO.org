@@ -1,5 +1,5 @@
 * TODO Определить Actor::Id
-* TODO Усовершенствовать [[file:src/amf/src/message_handler.h][uau::amf::MessageHandler]]
+* DONE Усовершенствовать [[file:src/amf/src/message_handler.h][uau::amf::MessageHandler]]
 1. Вынести dynamic_cast<T*>(Message *) в отдельную стратегию, тем самым сделать
    класс более универсальным;
 2. Вынести этот класс из amf в uau;

@@ -42,14 +42,14 @@
 
 #include <memory>
 #include <functional>
-#include "message_handler.h"
+#include "core/envelope.h"
+#include "handlerset.h"
 
 
 namespace uau {
 namespace amf {
 
 
-class Message;
 class ActorPrivate;
 
 
@@ -60,8 +60,8 @@ public:
     Id id() const;                              /*concurrent*/
     bool pendingForDeletion() const noexcept;   /*concurrent*/
 
-    std::shared_ptr<Message> popFromOutput();   /*concurrent*/
-    void pushToInput(std::shared_ptr<Message>); /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput();   /*concurrent*/
+    void pushToInput(std::shared_ptr<core::Envelope<>>); /*concurrent*/
 
     void activate();                            // blocks the current thread until the input queue is empty
     void tryActivate();
@@ -71,32 +71,39 @@ public:
 protected:
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
     void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
-        _handler.setHandlerFor<Msgs...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
+        _handler.setHandlerFor<core::Envelope<Msgs>...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
     }
 
     template<class... Msgs, class Callable, class... Args>
     typename std::enable_if<not std::is_member_function_pointer<Callable>::value>::type
     on(Callable &&f, Args&&... args) {
-        _handler.setHandlerFor<Msgs...>(std::forward<Callable>(f), std::forward<Args>(args)...);
+        _handler.setHandlerFor<core::Envelope<Msgs>...>(std::forward<Callable>(f), std::forward<Args>(args)...);
     }
 
-    void send(std::unique_ptr<Message>);
+    template<class T>
+    void send(T &&message) {
+        // FIXME: since C++14 use std::make_unique
+        std::unique_ptr<core::Envelope<T>> envelope{new core::Envelope<T>{std::forward<T>(message)}};
+        sendEnvelope(std::move(envelope));
+    }
 
     /**
      * @brief get received message
      * @return received message
      */
-    std::shared_ptr<const Message> message() const;
+    std::shared_ptr<const core::Envelope<>> message() const;
 
 private:
     /**
      * @brief Schedule this actor for deletion
      */
     void deleteLater();
+    void sendEnvelope(std::unique_ptr<core::Envelope<>>);
+
 
 protected:
     Actor();                                    // this class is abstract
-    MessageHandler<> _handler;
+    HandlerSet<core::Envelope<>> _handler;
 
 protected:
     Actor(std::unique_ptr<ActorPrivate>);

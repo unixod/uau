@@ -1,10 +1,15 @@
-#include "lest/lest.hpp"
-#include "message_queue.h"
-#include "message.h"
 #include <future>
 #include <algorithm>
+#include "lest/lest.hpp"
+#include "message_queue.h"
+#include "core/envelope.h"
 
-class Msg : public uau::amf::Message {
+
+namespace amf = uau::amf;
+namespace core = amf::core;
+
+
+class Msg {
 public:
     Msg(int i) : i(i) {}
 
@@ -26,15 +31,13 @@ const lest::test specification[] = {
 
             std::async(std::launch::async, [&]{
                 for(int i = 0; i < k/2; i++) {
-                    std::unique_ptr<Msg> msg(new Msg(i));
-                    queue.push(std::move(msg));
+                    queue.push(std::make_shared<core::Envelope<Msg>>(i));
                 }
             });
 
             std::async(std::launch::async, [&]{
                 for(int i = k/2; i < k; i++) {
-                    std::unique_ptr<Msg> msg(new Msg(i));
-                    queue.push(std::move(msg));
+                    queue.push(std::make_shared<core::Envelope<Msg>>(i));
                 }
             });
 
@@ -43,8 +46,8 @@ const lest::test specification[] = {
             std::generate_n(std::back_inserter(v), k, [&i](){return i++;});
 
             for(int i = 0; i < k; i++) {
-                std::shared_ptr<Msg> msg = std::dynamic_pointer_cast<Msg>(queue.waitAndPop());
-                v.erase(std::lower_bound(v.begin(), v.end(), msg->getNum()));
+                auto envelope = std::dynamic_pointer_cast<core::Envelope<Msg>>(queue.waitAndPop());
+                v.erase(std::lower_bound(v.begin(), v.end(), envelope->message().getNum()));
             }
 
             EXPECT(v.size() == 0);

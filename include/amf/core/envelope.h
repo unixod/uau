@@ -36,8 +36,8 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_MESSAGE_H
-#define UAU_AMF_MESSAGE_H
+#ifndef UAU_AMF_CORE_ENVELOPE_H
+#define UAU_AMF_CORE_ENVELOPE_H
 
 
 #include <type_traits>
@@ -45,24 +45,57 @@
 
 namespace uau {
 namespace amf {
+namespace core {
 
-
-struct Message {
-    template<class Msg>
-    bool is() const noexcept {
+template<class...>
+class Envelope{
+public:
+    template<class T>
+    bool is() const {
         return dynamic_cast<
-                    typename std::add_pointer<
-                        typename std::add_const<Msg>::type
+                typename std::add_pointer<
+                    typename std::add_const<
+                        Envelope<T>
                     >::type
-                >(this);
+                >::type
+               >(this);
     }
 
-    virtual ~Message() {}
+    virtual ~Envelope() {}
 };
 
+template<class Message>
+class Envelope<Message> : public Envelope<> {
+public:
+    Envelope() = default;
+    Envelope(const Envelope &) = default;
+    Envelope(Envelope &&) = default;
 
+    Envelope & operator = (const Envelope &) = default;
+    Envelope & operator = (Envelope &&) = default;
+
+    Envelope(Message&& msg) :
+        _message(msg) {}
+
+    Message & message() {
+        return _message;
+    }
+
+    const Message & message() const {
+        return _message;
+    }
+
+private:
+    Message _message;
+};
+
+template<class T, class... Ts>
+class Envelope<T, Ts...>;
+
+
+} // namespace core
 } // namespace amf
 } // namespace uau
 
 
-#endif // UAU_AMF_MESSAGE_H
+#endif // UAU_AMF_CORE_ENVELOPE_H

@@ -51,7 +51,7 @@ namespace core {
 class MainRouter : public Router {
 public:
     void addRouter(std::unique_ptr<Router>);
-    std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<Message>) override;
+    std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<core::Envelope<>>) override;
 };
 
 

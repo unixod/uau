@@ -58,4 +58,4 @@ public:
 } // namespace uau
 
 
-#endif // UAU_AMF_MESSAGE_H
+#endif // UAU_AMF_ACTOR_ID_H

@@ -1,6 +1,5 @@
 #include "lest/lest.hpp"
-#include "message_handler.h"
-#include "message.h"
+#include "handlerset.h"
 
 
 class HandlerName {
@@ -31,11 +30,16 @@ private:
 std::string HandlerName::handlerName;
 
 
-class Msg1 : public uau::amf::Message{};
-class Msg2 : public uau::amf::Message{};
-class Msg3 : public uau::amf::Message{};
-class Msg4 : public uau::amf::Message{};
-class Msg5 : public uau::amf::Message{};
+class Message {
+public:
+    virtual ~Message() {}
+};
+
+class Msg1 : public Message{};
+class Msg2 : public Message{};
+class Msg3 : public Message{};
+class Msg4 : public Message{};
+class Msg5 : public Message{};
 
 
 void handlerFreeFunc() {
@@ -58,13 +62,13 @@ void handlerForMultipleMessages() {
     HandlerName("handlerForMultipleMessages");
 }
 
-uau::amf::MessageHandler<> handler;
+uau::HandlerSet<Message> handler;
 
 const lest::test specification[] = {
     "Msg1 -> handlerFreeFunc()", []{
         HandlerName lastInvokedHandler;
 
-        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        std::unique_ptr<Message> msg(new Msg1);
 
         EXPECT(handler.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "handlerFreeFunc");
@@ -72,7 +76,7 @@ const lest::test specification[] = {
 
     "Msg2 -> handlerFreeFuncWithArgs(int i, const std::string &str)",[]{
         HandlerName lastInvokedHandler;
-        std::unique_ptr<uau::amf::Message> msg(new Msg2);
+        std::unique_ptr<Message> msg(new Msg2);
 
         EXPECT(handler.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "handlerFreeFuncWithArgs");
@@ -80,7 +84,7 @@ const lest::test specification[] = {
 
     "Msg3 -> Foo::bar(int)",[]{
         HandlerName lastInvokedHandler;
-        std::unique_ptr<uau::amf::Message> msg(new Msg3);
+        std::unique_ptr<Message> msg(new Msg3);
 
         EXPECT(handler.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "Foo::bar");
@@ -88,7 +92,7 @@ const lest::test specification[] = {
 
     "Msg4 -> handlerForMultipleMessages()",[]{
         HandlerName lastInvokedHandler;
-        std::unique_ptr<uau::amf::Message> msg(new Msg4);
+        std::unique_ptr<Message> msg(new Msg4);
 
         EXPECT(handler.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
@@ -96,7 +100,7 @@ const lest::test specification[] = {
 
     "Msg5 -> handlerForMultipleMessages()",[]{
         HandlerName lastInvokedHandler;
-        std::unique_ptr<uau::amf::Message> msg(new Msg5);
+        std::unique_ptr<Message> msg(new Msg5);
 
         EXPECT(handler.handle(msg.get()));
         EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
@@ -105,18 +109,18 @@ const lest::test specification[] = {
     "move constructor", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::MessageHandler<> h1;
+        uau::HandlerSet<Message> h1;
         h1.setHandlerFor<Msg1>([]{});
 
-        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        std::unique_ptr<Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::MessageHandler<> h2 = std::move(h1);
+        uau::HandlerSet<Message> h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
 
         h1.setHandlerFor<Msg3>([]{});
-        std::unique_ptr<uau::amf::Message> msg3(new Msg3);
+        std::unique_ptr<Message> msg3(new Msg3);
         EXPECT(h1.handle(msg3.get()));
         EXPECT(!h2.handle(msg3.get()));
     },
@@ -124,26 +128,26 @@ const lest::test specification[] = {
     "move assignment", []{
         HandlerName lastInvokedHandler;
 
-        uau::amf::MessageHandler<> h1;
+        uau::HandlerSet<Message> h1;
         h1.setHandlerFor<Msg1>(handlerFreeFunc);
 
-        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        std::unique_ptr<Message> msg(new Msg1);
         EXPECT(h1.handle(msg.get()));
 
-        uau::amf::MessageHandler<> h2;
+        uau::HandlerSet<Message> h2;
         h2 = std::move(h1);
         EXPECT(!h1.handle(msg.get()));
         EXPECT(h2.handle(msg.get()));
 
         h1.setHandlerFor<Msg3>([]{});
-        std::unique_ptr<uau::amf::Message> msg3(new Msg3);
+        std::unique_ptr<Message> msg3(new Msg3);
         EXPECT(h1.handle(msg3.get()));
         EXPECT(!h2.handle(msg3.get()));
     },
 
     "handlers overriding", []{
-        uau::amf::MessageHandler<> h;
-        std::unique_ptr<uau::amf::Message> msg(new Msg1);
+        uau::HandlerSet<Message> h;
+        std::unique_ptr<Message> msg(new Msg1);
 
         {
             HandlerName lastInvokedHandler;
@@ -159,6 +163,20 @@ const lest::test specification[] = {
             EXPECT(h.handle(msg.get()));
             EXPECT(lastInvokedHandler.name() == "handlerForMultipleMessages");
         }
+    },
+
+    "message passing", [] {
+        uau::HandlerSet<Message> actions;
+
+        actions.setHandlerFor<Msg1>([](const Message *b){
+            EXPECT(dynamic_cast<const Msg1 *>(b));
+        }, std::placeholders::_1);
+
+        std::unique_ptr<Message> msg(new Msg1);
+        EXPECT(actions.handle(msg.get()));
+
+        msg.reset(new Msg2);
+        EXPECT(!actions.handle(msg.get()));
     }
 };
 
