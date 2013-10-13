@@ -55,11 +55,7 @@ public:
         return dynamic_cast<
                 typename std::add_pointer<
                     typename std::add_const<
-                        Envelope<
-                            typename std::add_pointer<
-                                typename std::add_const<T>::type
-                            >::type
-                        >
+                        Envelope<T>
                     >::type
                 >::type
                >(this);

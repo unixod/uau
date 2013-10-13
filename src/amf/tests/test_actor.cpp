@@ -5,13 +5,16 @@
 #include "lest/lest.hpp"
 #include "actor.h"
 #include "core/envelope.h"
-#include "message.h"
 
 
-class Msg1 : public uau::amf::Message {};
-class Msg2 : public uau::amf::Message {};
-class Msg3 : public uau::amf::Message {};
-class Msg4 : public uau::amf::Message {};
+namespace amf = uau::amf;
+namespace core = amf::core;
+
+
+class Msg1 {};
+class Msg2 {};
+class Msg3 {};
+class Msg4 {};
 
 
 class TestActor : public uau::amf::Actor {
@@ -33,8 +36,8 @@ public:
 
 const lest::test specification[] = {
     "transitions", []{
-        class A : public uau::amf::Message {};
-        class B : public uau::amf::Message {};
+        class A {};
+        class B {};
 
         /*
          *                              __B__
@@ -83,12 +86,11 @@ const lest::test specification[] = {
 
             while(!sm.pendingForDeletion()) {
                 if(dis(gen))
-                    sm.pushToInput(std::make_shared<A>());
+                    sm.pushToInput(std::make_shared<core::Envelope<A>>());
                 else
-                    sm.pushToInput(std::make_shared<B>());
+                    sm.pushToInput(std::make_shared<core::Envelope<B>>());
             }
         });
-
 
         while(!sm.pendingForDeletion())
             sm.activate();
