@@ -36,11 +36,3 @@ set(3RDPARTY_LIB_DIR
 
 add_subdirectory(src)
 
-showFilesInIDE(
-    "${LIBUAU_INCLUDE_DIR}/concurrency_algo.h"
-    "${LIBUAU_INCLUDE_DIR}/amf/core/envelope.h"
-    "${LIBUAU_INCLUDE_DIR}/amf/core/envelope_fwd.h"
-    "${LIBUAU_INCLUDE_DIR}/handlerset.h"
-    "${LIBUAU_INCLUDE_DIR}/rangeset.h"
-    "${LIBUAU_INCLUDE_DIR}/threadpool.h"
-    "${LIBUAU_INCLUDE_DIR}/typeset.h")
