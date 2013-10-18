@@ -12,12 +12,3 @@ if(LIBUAU_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-showFilesInIDE(
-    "${LIBUAU_AMF_INCLUDE_DIR}/actor.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/actor_id.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/dispatcher.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/node.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/router.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/core/actors_db.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/core/actors_storage.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/core/main_router.h")
