@@ -46,7 +46,10 @@ namespace core {
 namespace messages {
 
 
-class SystemMessage {};
+class SystemMessage {
+public:
+    virtual ~SystemMessage() {}
+};
 
 
 } // namespace messages
