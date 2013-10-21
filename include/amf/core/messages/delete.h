@@ -40,9 +40,7 @@
 #define UAU_AMF_CORE_MESSAGES_DELETE_H
 
 
-#include <utility>
 #include "control_message.h"
-#include "actor_id.h"
 
 
 namespace uau {
@@ -51,25 +49,7 @@ namespace core {
 namespace messages {
 
 
-class Delete : public ControlMessage {
-public:
-    Delete(const Actor::Id &id) :
-        _id{id} {}
-
-    Delete(const Actor::Id &&id) :
-        _id{std::move(id)} {}
-
-    Actor::Id id() const & noexcept {
-        return _id;
-    }
-
-    Actor::Id id() && noexcept {
-        return std::move(_id);
-    }
-
-private:
-    Actor::Id _id;
-};
+class Delete : public ControlMessage {};
 
 
 } // namespace messages
