@@ -57,11 +57,10 @@ class Actor {
 public:
     class Id;
 
-    Id id() const;                              /*concurrent*/
-    bool pendingForDeletion() const noexcept;   /*concurrent*/
+    Id id() const;                                          /*concurrent*/
 
-    std::shared_ptr<core::Envelope<>> popFromOutput();   /*concurrent*/
-    void pushToInput(std::shared_ptr<core::Envelope<>>); /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput();      /*concurrent*/
+    void pushToInput(std::shared_ptr<core::Envelope<>>);    /*concurrent*/
 
     void activate();                            // blocks the current thread until the input queue is empty
     void tryActivate();
@@ -97,7 +96,6 @@ private:
     /**
      * @brief Schedule this actor for deletion
      */
-    void deleteLater();
     void sendEnvelope(std::unique_ptr<core::Envelope<>>);
 
 

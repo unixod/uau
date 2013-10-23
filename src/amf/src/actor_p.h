@@ -51,13 +51,9 @@ namespace amf {
 
 class ActorPrivate {
 public:
-    ActorPrivate() :
-        pendingForDeletion(false) {}
-
     MessageQueue inputQueue;
     MessageQueue outputQueue;
     std::shared_ptr<const core::Envelope<>> message;
-    std::atomic<bool> pendingForDeletion;
 };
 
 

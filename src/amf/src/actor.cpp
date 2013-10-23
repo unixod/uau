@@ -1,5 +1,6 @@
 #include "actor.h"
 #include "actor_p.h"
+#include "core/messages/delete.h"
 
 
 namespace amf = uau::amf;
@@ -24,7 +25,7 @@ void amf::Actor::pushToInput(std::shared_ptr<core::Envelope<>> msg) {
 
 void amf::Actor::activate() {
     if(_handler.empty()) {           // actor in final state
-        deleteLater();
+        send(core::messages::Delete{});
     } else {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
         HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -37,7 +38,7 @@ void amf::Actor::activate() {
 
 void amf::Actor::tryActivate() {
     if(_handler.empty()) {           // actor in final state
-        deleteLater();
+        send(core::messages::Delete{});
     } else {
         if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
             HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -53,14 +54,6 @@ std::shared_ptr<const core::Envelope<>> amf::Actor::message() const {
     return d_ptr->message;
 }
 
-void amf::Actor::deleteLater() {
-    d_ptr->pendingForDeletion = true;
-}
-
 void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg) {
   d_ptr->outputQueue.push(std::move(msg));
-}
-
-bool amf::Actor::pendingForDeletion() const noexcept {
-    return d_ptr->pendingForDeletion;
 }
