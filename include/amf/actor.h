@@ -93,9 +93,6 @@ protected:
     std::shared_ptr<const core::Envelope<>> message() const;
 
 private:
-    /**
-     * @brief Schedule this actor for deletion
-     */
     void sendEnvelope(std::unique_ptr<core::Envelope<>>);
 
 
