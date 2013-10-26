@@ -1,11 +1,11 @@
 #include "core/main_router.h"
-#include "actor_id.h"
+#include "core/abstract_actor_id.h"
 
 
 namespace amf = uau::amf;
 namespace core = uau::amf::core;
 
 
-std::vector<amf::Actor::Id> core::MainRouter::rout(amf::Actor::Id, std::shared_ptr<core::Envelope<>>) {
+std::vector<core::AbstractActor::Id> core::MainRouter::rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) {
 
 }

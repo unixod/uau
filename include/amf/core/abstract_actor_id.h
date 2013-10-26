@@ -36,26 +36,28 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_ACTOR_ID_H
-#define UAU_AMF_ACTOR_ID_H
+#ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
+#define UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
 
 
 #include <string>
-#include "actor.h"
+#include "abstract_actor.h"
 
 
 namespace uau {
 namespace amf {
+namespace core {
 
 
-class Actor::Id {
+class AbstractActor::Id {
 public:
     Id(const std::string &);
 };
 
 
+} // namespace core
 } // namespace amf
 } // namespace uau
 
 
-#endif // UAU_AMF_ACTOR_ID_H
+#endif // UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H

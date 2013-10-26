@@ -41,7 +41,7 @@
 
 
 #include <vector>
-#include "actor.h"
+#include "core/abstract_actor.h"
 
 
 namespace uau {
@@ -50,7 +50,7 @@ namespace amf {
 
 class Router {
 public:
-    virtual std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<core::Envelope<>>) = 0;  /*concurrent*/
+    virtual std::vector<core::AbstractActor::Id> rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) = 0;  /*concurrent*/
 
     virtual ~Router() {}
 };

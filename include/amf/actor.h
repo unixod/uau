@@ -42,6 +42,7 @@
 
 #include <memory>
 #include <functional>
+#include "core/abstract_actor.h"
 #include "core/envelope.h"
 #include "handlerset.h"
 
@@ -53,20 +54,16 @@ namespace amf {
 class ActorPrivate;
 
 
-class Actor {
+class Actor : public core::AbstractActor {
 public:
-    class Id;
+    virtual ~Actor();                                               // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
 
-    Id id() const;                                          /*concurrent*/
+    void pushToInput(std::shared_ptr<core::Envelope<>>) override;   /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput() override;     /*concurrent*/
+    std::shared_ptr<core::Envelope<>> tryPopFromOutput() override;  /*concurrent*/
 
-    void pushToInput(std::shared_ptr<core::Envelope<>>);    /*concurrent*/
-    std::shared_ptr<core::Envelope<>> popFromOutput();      /*concurrent*/
-    std::shared_ptr<core::Envelope<>> tryPopFromOutput();   /*concurrent*/
-
-    void activate();                                        // blocks the current thread until the input queue is empty
-    void tryActivate();
-
-    virtual ~Actor();                                       // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
+    void activate() override;                                       // blocks the current thread until the input queue is empty
+    void tryActivate() override;
 
 protected:
     Actor();

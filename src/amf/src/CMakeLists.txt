@@ -9,9 +9,9 @@ include_directories(
 set(LIBUAU_AMF_SOURCES
     node.cpp
     actor.cpp
-    actor_id.cpp
     message_queue.cpp
-    "core/main_router.cpp")
+    core/abstract_actor_id.cpp
+    core/main_router.cpp)
 
 add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
@@ -19,9 +19,9 @@ showFilesInIDE(
     actor_p.h
     message_queue.h
     "${LIBUAU_AMF_INCLUDE_DIR}/actor.h"
-    "${LIBUAU_AMF_INCLUDE_DIR}/actor_id.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/dispatcher.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/abstract_actor.h"
+    "${LIBUAU_AMF_INCLUDE_DIR}/core/abstract_actor_id.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope_fwd.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/main_router.h"
