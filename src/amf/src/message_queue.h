@@ -53,14 +53,17 @@ namespace amf {
 
 class MessageQueue {
 public:
+    ~MessageQueue();
+
     void push(std::shared_ptr<core::Envelope<>> msg);            /*concurrent*/
     std::shared_ptr<core::Envelope<>> waitAndPop();              /*concurrent*/
     std::shared_ptr<core::Envelope<>> tryPop();
 
 private:
     std::queue<std::shared_ptr<core::Envelope<>>> _q;
-    mutable std::mutex _mx;
-    mutable std::condition_variable _cond;
+    std::mutex _mx;
+    std::condition_variable _cond;
+    bool _destruction = false;
 };
 
 

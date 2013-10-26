@@ -59,15 +59,18 @@ public:
 
     Id id() const;                                          /*concurrent*/
 
-    std::shared_ptr<core::Envelope<>> popFromOutput();      /*concurrent*/
     void pushToInput(std::shared_ptr<core::Envelope<>>);    /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput();      /*concurrent*/
+    std::shared_ptr<core::Envelope<>> tryPopFromOutput();   /*concurrent*/
 
-    void activate();                            // blocks the current thread until the input queue is empty
+    void activate();                                        // blocks the current thread until the input queue is empty
     void tryActivate();
 
-    virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
+    virtual ~Actor();                                       // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
 
 protected:
+    Actor();
+
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
     void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
         _handler.setHandlerFor<core::Envelope<Msgs>...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
@@ -94,10 +97,6 @@ protected:
 
 private:
     void sendEnvelope(std::unique_ptr<core::Envelope<>>);
-
-
-protected:
-    Actor();                                    // this class is abstract
     HandlerSet<core::Envelope<>> _handler;
 
 protected:
