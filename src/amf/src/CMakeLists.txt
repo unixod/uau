@@ -11,7 +11,8 @@ set(LIBUAU_AMF_SOURCES
     actor.cpp
     message_queue.cpp
     core/abstract_actor_id.cpp
-    core/main_router.cpp)
+    core/main_router.cpp
+    core/master_actor.cpp)
 
 add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
@@ -25,6 +26,7 @@ showFilesInIDE(
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope_fwd.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/main_router.h"
+    "${LIBUAU_AMF_INCLUDE_DIR}/core/master_actor.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/messages/control_message.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/messages/delete.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/messages/system_message.h"
