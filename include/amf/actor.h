@@ -63,7 +63,7 @@ public:
     std::shared_ptr<core::Envelope<>> tryPopFromOutput() override;  /*concurrent*/
 
     void activate() override;                                       // blocks the current thread until the input queue is empty
-    void tryActivate() override;
+    bool tryActivate() override;
 
 protected:
     Actor();

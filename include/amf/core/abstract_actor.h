@@ -60,7 +60,7 @@ public:
     virtual std::shared_ptr<Envelope<>> tryPopFromOutput() = 0;     /*concurrent*/
 
     virtual void activate() = 0;
-    virtual void tryActivate() = 0;
+    virtual bool tryActivate() = 0;
 };
 
 

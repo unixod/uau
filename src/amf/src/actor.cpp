@@ -40,9 +40,12 @@ void amf::Actor::activate() {
     }
 }
 
-void amf::Actor::tryActivate() {
+bool amf::Actor::tryActivate() {
+    bool activated = false;
+
     if(_handler.empty()) {           // actor in final state
         send(core::messages::Delete{});
+        activated = true;
     } else {
         if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
             HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -51,7 +54,10 @@ void amf::Actor::tryActivate() {
                 _handler = std::move(h);
             }
         }
+        activated = static_cast<bool>(d_ptr->message);
     }
+
+    return activated;
 }
 
 std::shared_ptr<const core::Envelope<>> amf::Actor::message() const {
