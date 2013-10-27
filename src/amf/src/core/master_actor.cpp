@@ -5,7 +5,7 @@
 namespace core = uau::amf::core;
 
 
-void core::MasterActor::pushToInput(std::shared_ptr<Envelope<> >) {
+void core::MasterActor::pushToInput(Id, std::shared_ptr<Envelope<> >) {
 }
 
 std::shared_ptr<core::Envelope<>> core::MasterActor::popFromOutput() {

@@ -56,14 +56,14 @@ class ActorPrivate;
 
 class Actor : public core::AbstractActor {
 public:
-    virtual ~Actor();                                               // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
+    virtual ~Actor();                                                       // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
 
-    void pushToInput(std::shared_ptr<core::Envelope<>>) override;   /*concurrent*/
-    std::shared_ptr<core::Envelope<>> popFromOutput() override;     /*concurrent*/
-    std::shared_ptr<core::Envelope<>> tryPopFromOutput() override;  /*concurrent*/
+    void pushToInput(AbstractActor::Id, std::shared_ptr<core::Envelope<>>) final override;     /*concurrent*/
+    std::shared_ptr<core::Envelope<>> popFromOutput() final override;       /*concurrent*/
+    std::shared_ptr<core::Envelope<>> tryPopFromOutput() final override;    /*concurrent*/
 
-    void activate() override;                                       // blocks the current thread until the input queue is empty
-    bool tryActivate() override;
+    void activate() final override;                                         // blocks the current thread until the input queue is empty
+    bool tryActivate() final override;
 
 protected:
     Actor();

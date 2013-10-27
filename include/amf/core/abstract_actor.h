@@ -55,9 +55,9 @@ public:
 
     virtual ~AbstractActor() {}
 
-    virtual void pushToInput(std::shared_ptr<Envelope<>>) = 0;      /*concurrent*/
-    virtual std::shared_ptr<Envelope<>> popFromOutput() = 0;        /*concurrent*/
-    virtual std::shared_ptr<Envelope<>> tryPopFromOutput() = 0;     /*concurrent*/
+    virtual void pushToInput(Id src, std::shared_ptr<Envelope<>>) = 0;  /*concurrent*/
+    virtual std::shared_ptr<Envelope<>> popFromOutput() = 0;            /*concurrent*/
+    virtual std::shared_ptr<Envelope<>> tryPopFromOutput() = 0;         /*concurrent*/
 
     virtual void activate() = 0;
     virtual bool tryActivate() = 0;

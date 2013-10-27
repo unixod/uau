@@ -1,6 +1,7 @@
 #include "actor.h"
 #include "actor_p.h"
 #include "core/messages/delete.h"
+#include "core/abstract_actor_id.h"
 
 
 namespace amf = uau::amf;
@@ -15,7 +16,7 @@ amf::Actor::Actor(std::unique_ptr<amf::ActorPrivate> d) :
 
 amf::Actor::~Actor() {}
 
-void amf::Actor::pushToInput(std::shared_ptr<core::Envelope<>> msg) {
+void amf::Actor::pushToInput(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg) {
     d_ptr->inputQueue.push(msg);
 }
 
