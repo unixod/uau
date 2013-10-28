@@ -6,6 +6,5 @@ namespace amf = uau::amf;
 namespace core = uau::amf::core;
 
 
-std::vector<core::AbstractActor::Id> core::MainRouter::rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) {
-
+std::pair<std::vector<core::AbstractActor::Id>, bool> core::MainRouter::rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) {
 }
