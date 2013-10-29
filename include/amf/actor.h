@@ -94,6 +94,7 @@ protected:
 
 private:
     void sendEnvelope(std::unique_ptr<core::Envelope<>>);
+    // TODO: move this member to private class
     HandlerSet<core::Envelope<>> _handler;
 
 protected:

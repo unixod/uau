@@ -51,14 +51,31 @@ template<class...>
 class Envelope{
 public:
     template<class T>
-    bool is() const {
-        return dynamic_cast<
-                typename std::add_pointer<
-                    typename std::add_const<
-                        Envelope<T>
-                    >::type
-                >::type
-               >(this);
+    const T * is() {
+        if(auto content = dynamic_cast<
+                            typename std::add_pointer<
+                                Envelope<T>
+                            >::type
+                           >(this)) {
+            return &content->message();
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<class T>
+    const T * is() const {
+        if(auto content = dynamic_cast<
+                            typename std::add_pointer<
+                                typename std::add_const<
+                                    Envelope<T>
+                                >::type
+                            >::type
+                           >(this)) {
+            return &content->message();
+        } else {
+            return nullptr;
+        }
     }
 
     virtual ~Envelope() {}
@@ -77,12 +94,16 @@ public:
     Envelope(Message&& msg) :
         _message(msg) {}
 
-    Message & message() {
+    Message & message() & {
         return _message;
     }
 
-    const Message & message() const {
+    const Message & message() const & {
         return _message;
+    }
+
+    Message message() && {
+        return std::move(_message);
     }
 
 private:

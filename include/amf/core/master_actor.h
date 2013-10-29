@@ -41,6 +41,7 @@
 
 
 #include "abstract_actor.h"
+#include "message_queue.h"
 
 
 namespace uau {
@@ -58,6 +59,9 @@ public:
     bool tryActivate() override;
 
     AbstractActor::Id nextPendingForDeletion();
+
+private:
+    MessageQueue _messages;
 };
 
 
