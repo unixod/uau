@@ -39,14 +39,11 @@
 #ifndef UAU_HANDLER_SET_H
 #define UAU_HANDLER_SET_H
 
-
 #include <vector>
 #include <memory>
 #include "typeset.h"
 
-
 namespace uau {
-
 
 /**
  * @brief HandlerSet matching function
@@ -55,7 +52,6 @@ template<class Derived, class Base>
 bool handlerSetMatcher(Base b) {
     return dynamic_cast<Derived>(b);
 }
-
 
 /**
  * @brief Map of typed actions
@@ -244,8 +240,6 @@ private:
     bool _disabled = false;
 };
 
-
 } // namespace uau
-
 
 #endif // UAU_HANDLER_SET_H

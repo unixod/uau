@@ -39,17 +39,14 @@
 #ifndef UAU_AMF_MESSAGE_QUEUE_H
 #define UAU_AMF_MESSAGE_QUEUE_H
 
-
 #include <memory>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include "core/envelope_fwd.h"
 
-
 namespace uau {
 namespace amf {
-
 
 class MessageQueue {
 public:
@@ -66,9 +63,7 @@ private:
     bool _destruction = false;
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // LIBUAU_AMF_MESSAGE_QUEUE_H

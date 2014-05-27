@@ -39,21 +39,18 @@
 #ifndef UAU_AMF_CORE_MASTER_ACTOR_H
 #define UAU_AMF_CORE_MASTER_ACTOR_H
 
-
 #include "abstract_actor.h"
 #include "message_queue.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 
-
 class MasterActor : public AbstractActor {
 public:
     void pushToInput(AbstractActor::Id, std::shared_ptr<Envelope<>>) override;      /*concurrent*/
-    std::shared_ptr<Envelope<>> popFromOutput() override;        /*concurrent*/
-    std::shared_ptr<Envelope<>> tryPopFromOutput() override;     /*concurrent*/
+    std::shared_ptr<Envelope<>> popFromOutput() override;                           /*concurrent*/
+    std::shared_ptr<Envelope<>> tryPopFromOutput() override;                        /*concurrent*/
 
     void activate() override;
     bool tryActivate() override;
@@ -64,10 +61,8 @@ private:
     MessageQueue _messages;
 };
 
-
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_MASTER_ACTOR_H

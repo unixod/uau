@@ -5,7 +5,8 @@
 
 namespace core = uau::amf::core;
 
-void core::MasterActor::pushToInput(Id id, std::shared_ptr<Envelope<>> msg) {
+void core::MasterActor::pushToInput(Id id, std::shared_ptr<Envelope<>> msg)
+{
     const core::messages::SystemMessage d;
     core::envelope_cast<const core::messages::SystemMessage &>(d);
 //    if(core::envelope_cast<core::messages::SystemMessage>(msg)) {
@@ -19,18 +20,23 @@ void core::MasterActor::pushToInput(Id id, std::shared_ptr<Envelope<>> msg) {
 //    }
 }
 
-std::shared_ptr<core::Envelope<>> core::MasterActor::popFromOutput() {
+std::shared_ptr<core::Envelope<>> core::MasterActor::popFromOutput()
+{
 }
 
-std::shared_ptr<core::Envelope<>> core::MasterActor::tryPopFromOutput() {
+std::shared_ptr<core::Envelope<>> core::MasterActor::tryPopFromOutput()
+{
 }
 
-void core::MasterActor::activate() {
+void core::MasterActor::activate()
+{
 
 }
 
-bool core::MasterActor::tryActivate() {
+bool core::MasterActor::tryActivate()
+{
 }
 
-core::AbstractActor::Id core::MasterActor::nextPendingForDeletion() {
+core::AbstractActor::Id core::MasterActor::nextPendingForDeletion()
+{
 }

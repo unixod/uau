@@ -44,7 +44,6 @@
 namespace uau {
 namespace amf {
 
-
 class Dispatcher{
 public:
     virtual ~Dispatcher() {}
@@ -60,9 +59,7 @@ public:
     virtual void excludeActor(core::AbstractActor::Id) = 0;
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_DISPATCHER_H

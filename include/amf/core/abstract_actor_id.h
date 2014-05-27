@@ -39,25 +39,20 @@
 #ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
 #define UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
 
-
 #include <string>
 #include "abstract_actor.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
-
 
 class AbstractActor::Id {
 public:
     Id(const std::string &);
 };
 
-
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H

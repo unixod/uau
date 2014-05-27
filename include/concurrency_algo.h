@@ -43,25 +43,20 @@
 #ifndef UAU_CONCURRENCY_ALGO_H
 #define UAU_CONCURRENCY_ALGO_H
 
-
 #include <algorithm>
 #include <vector>
 #include <list>
 #include "threadpool.h"
 
-
 namespace uau {
-
 
 typedef size_t ChunkSize;
 typedef size_t ChunkCoord;
 typedef std::list< std::pair<ChunkCoord, ChunkCoord> > ChunkSet;
 
-
 namespace _intersection {
 typedef std::vector<ChunkCoord> ChunkMap;
 typedef std::vector<ChunkMap> map;
-
 
 template<class InputIterator1, class InputIterator2>
 void chunkMap(ChunkMap &ret, InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2) {
@@ -118,7 +113,6 @@ void maxChunks(std::pair<ChunkSize, ChunkSet> &chunksGrp, int id, int k, size_t 
 }
 
 } // namespace _intersection
-
 
 /**
   @brief    Constructs the set of maximum intersections of the two sorted ranges
@@ -178,8 +172,6 @@ std::pair<ChunkSize, ChunkSet> maxIntersections(int k, size_t m, InputIterator1 
     return {maxChunkLen, chunks};
 }
 
-
 } // namespace uau
-
 
 #endif // UAU_CONCURRENCY_ALGO_H

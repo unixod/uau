@@ -39,23 +39,18 @@
 #ifndef UAU_AMF_CORE_MESSAGES_DELETE_H
 #define UAU_AMF_CORE_MESSAGES_DELETE_H
 
-
 #include "control_message.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 namespace messages {
 
-
 class Delete : public ControlMessage {};
-
 
 } // namespace messages
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_MESSAGES_DELETE_H

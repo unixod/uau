@@ -39,15 +39,12 @@
 #ifndef UAU_AMF_ACTOR_PRIVATE_H
 #define UAU_AMF_ACTOR_PRIVATE_H
 
-
 #include <atomic>
 #include "core/envelope.h"
 #include "message_queue.h"
 
-
 namespace uau {
 namespace amf {
-
 
 class ActorPrivate {
 public:
@@ -56,9 +53,7 @@ public:
     std::shared_ptr<const core::Envelope<>> message;
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_ACTOR_PRIVATE_H

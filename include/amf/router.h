@@ -39,25 +39,21 @@
 #ifndef UAU_AMF_ROUTER_H
 #define UAU_AMF_ROUTER_H
 
-
 #include <vector>
 #include "core/abstract_actor.h"
-
 
 namespace uau {
 namespace amf {
 
-
 class Router {
 public:
-    virtual std::pair<std::vector<core::AbstractActor::Id>, bool> rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) = 0;  /*concurrent*/
+    virtual std::pair<std::vector<core::AbstractActor::Id>, bool>
+    rout(core::AbstractActor::Id, std::shared_ptr<core::Envelope<>>) = 0;  /*concurrent*/
 
     virtual ~Router() {}
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_ROUTER_H

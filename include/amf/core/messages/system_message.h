@@ -39,23 +39,19 @@
 #ifndef UAU_AMF_CORE_MESSAGES_SYSTEM_MESSAGE_H
 #define UAU_AMF_CORE_MESSAGES_SYSTEM_MESSAGE_H
 
-
 namespace uau {
 namespace amf {
 namespace core {
 namespace messages {
-
 
 class SystemMessage {
 public:
     virtual ~SystemMessage() {}
 };
 
-
 } // namespace messages
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_MESSAGES_SYSTEM_MESSAGE_H

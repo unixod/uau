@@ -39,20 +39,16 @@
 #ifndef UAU_AMF_ACTOR_H
 #define UAU_AMF_ACTOR_H
 
-
 #include <memory>
 #include <functional>
 #include "core/abstract_actor.h"
 #include "core/envelope.h"
 #include "handlerset.h"
 
-
 namespace uau {
 namespace amf {
 
-
 class ActorPrivate;
-
 
 class Actor : public core::AbstractActor {
 public:
@@ -102,9 +98,7 @@ protected:
     std::unique_ptr<ActorPrivate> d_ptr;
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_ACTOR_H

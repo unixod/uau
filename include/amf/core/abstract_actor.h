@@ -39,20 +39,18 @@
 #ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_H
 #define UAU_AMF_CORE_ABSTRACT_ACTOR_H
 
-
 #include <memory>
 #include "core/envelope_fwd.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 
-
 class AbstractActor {
 public:
     class Id;
 
+public:
     virtual ~AbstractActor() {}
 
     virtual void pushToInput(Id src, std::shared_ptr<Envelope<>>) = 0;  /*concurrent*/
@@ -63,10 +61,8 @@ public:
     virtual bool tryActivate() = 0;
 };
 
-
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_ABSTRACT_ACTOR_H

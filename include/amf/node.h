@@ -39,18 +39,14 @@
 #ifndef UAU_AMF_NODE_H
 #define UAU_AMF_NODE_H
 
-
 #include <string>
 #include <memory>
-
 
 namespace uau {
 namespace amf {
 
-
 class Router;
 class Dispatcher;
-
 
 class Node{
 public:
@@ -61,9 +57,7 @@ public:
     void installDispatcher(std::unique_ptr<Dispatcher>);
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_NODE_H

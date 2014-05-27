@@ -2,6 +2,7 @@
 
 namespace core = uau::amf::core;
 
-core::AbstractActor::Id::Id(const std::string &) {
+core::AbstractActor::Id::Id(const std::string &)
+{
 }
 

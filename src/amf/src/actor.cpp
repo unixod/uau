@@ -3,10 +3,8 @@
 #include "core/messages/delete.h"
 #include "core/abstract_actor_id.h"
 
-
 namespace amf = uau::amf;
 namespace core = amf::core;
-
 
 amf::Actor::Actor() :
     d_ptr(new ActorPrivate) {}
@@ -16,19 +14,23 @@ amf::Actor::Actor(std::unique_ptr<amf::ActorPrivate> d) :
 
 amf::Actor::~Actor() {}
 
-void amf::Actor::pushToInput(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg) {
+void amf::Actor::pushToInput(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg)
+{
     d_ptr->inputQueue.push(msg);
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::popFromOutput() {
+std::shared_ptr<core::Envelope<>> amf::Actor::popFromOutput()
+{
     return d_ptr->outputQueue.waitAndPop();
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::tryPopFromOutput() {
+std::shared_ptr<core::Envelope<>> amf::Actor::tryPopFromOutput()
+{
     return d_ptr->outputQueue.tryPop();
 }
 
-void amf::Actor::activate() {
+void amf::Actor::activate()
+{
     if(_handler.empty()) {           // actor in final state
         send(core::messages::Delete{});
     } else {
@@ -41,7 +43,8 @@ void amf::Actor::activate() {
     }
 }
 
-bool amf::Actor::tryActivate() {
+bool amf::Actor::tryActivate()
+{
     bool activated = false;
 
     if(_handler.empty()) {           // actor in final state
@@ -61,10 +64,12 @@ bool amf::Actor::tryActivate() {
     return activated;
 }
 
-std::shared_ptr<const core::Envelope<>> amf::Actor::message() const {
+std::shared_ptr<const core::Envelope<>> amf::Actor::message() const
+{
     return d_ptr->message;
 }
 
-void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg) {
+void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg)
+{
   d_ptr->outputQueue.push(std::move(msg));
 }

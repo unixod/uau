@@ -39,9 +39,7 @@
 #ifndef UAU_TYPESET_H
 #define UAU_TYPESET_H
 
-
 namespace uau {
-
 
 /**
  * @brief Encapsulates set of types
@@ -103,8 +101,6 @@ class TypeSet<T> : public virtual TypeSet<> {};
 template<class T, class... Ts>
 class TypeSet<T, Ts...> : private TypeSet<Ts...>, public TypeSet<T> {};
 
-
 } // namespace uau
-
 
 #endif // UAU_TYPESET_H

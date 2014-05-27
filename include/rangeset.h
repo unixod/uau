@@ -39,13 +39,10 @@
 #ifndef UAU_RANGESET_H
 #define UAU_RANGESET_H
 
-
 #include <list>
 #include <algorithm>
 
-
 namespace uau {
-
 
 /**
   @brief Represents of ranges sequence
@@ -87,13 +84,11 @@ public:
     void exclude(T min, T max);
 };
 
-
 template <class T, template<class ...> class Sequence>
 void RangeSet<T, Sequence>::assign_range(T min, T max) {
     this->clear();
     this->push_back(std::make_pair(min, max));
 }
-
 
 template <class T, template<class ...> class Sequence>
 void RangeSet<T, Sequence>::exclude(T min, T max) {
@@ -128,8 +123,6 @@ void RangeSet<T, Sequence>::exclude(T min, T max) {
     }
 }
 
-
 } //namespace uau
-
 
 #endif // UAU_RANGESET_H
