@@ -3,11 +3,17 @@
 #include "core/messages/delete.h"
 #include "core/envelope.h"
 
-
 namespace core = uau::amf::core;
 
+void core::MasterActor::pushToInput(Id id, std::shared_ptr<Envelope<>> msg) {
+    const core::messages::SystemMessage d;
+    core::envelope_cast<const core::messages::SystemMessage &>(d);
+//    if(core::envelope_cast<core::messages::SystemMessage>(msg)) {
 
-void core::MasterActor::pushToInput(Id, std::shared_ptr<Envelope<>> msg) {
+//    }
+//    if(envelope_cast<core::messages::SystemMessage>(msg)) {
+//        _messages.push(std::make_shared<core::Envelope<std::pair<Id, core::Envelope<>>>({std::move(id), msg}));
+//    }
 //    if(msg->is<core::messages::SystemMessage>()) {
 //        _messages.push(std::make_shared<core::Envelope<std::pair<Id, core::messages::SystemMessage>);
 //    }
