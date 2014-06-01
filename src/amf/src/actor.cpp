@@ -14,17 +14,17 @@ amf::Actor::Actor(std::unique_ptr<amf::ActorPrivate> d) :
 
 amf::Actor::~Actor() {}
 
-void amf::Actor::pushToInput(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg)
+void amf::Actor::push(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg)
 {
     d_ptr->inputQueue.push(msg);
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::popFromOutput()
+std::shared_ptr<core::Envelope<>> amf::Actor::pull()
 {
     return d_ptr->outputQueue.waitAndPop();
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::tryPopFromOutput()
+std::shared_ptr<core::Envelope<>> amf::Actor::tryPull()
 {
     return d_ptr->outputQueue.tryPop();
 }

@@ -47,10 +47,10 @@ namespace amf {
 namespace core {
 
 class MasterActor : public AbstractActor {
-public:
-    void pushToInput(AbstractActor::Id, std::shared_ptr<Envelope<>>) override;      /*concurrent*/
-    std::shared_ptr<Envelope<>> popFromOutput() override;                           /*concurrent*/
-    std::shared_ptr<Envelope<>> tryPopFromOutput() override;                        /*concurrent*/
+private:
+    void push(AbstractActor::Id, std::shared_ptr<Envelope<>>) override; /*concurrent*/
+    std::shared_ptr<Envelope<>> pull() override;                        /*concurrent*/
+    std::shared_ptr<Envelope<>> tryPull() override;                     /*concurrent*/
 
     void activate() override;
     bool tryActivate() override;
