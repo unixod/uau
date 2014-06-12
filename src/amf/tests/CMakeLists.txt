@@ -4,6 +4,7 @@ include(addTest)
 
 include_directories(
     ${3RDPARTY_LIB_DIR}
+    "${3RDPARTY_LIB_DIR}/Catch/include"
     ${LIBUAU_INCLUDE_DIR}
     ${LIBUAU_AMF_INCLUDE_DIR}
     ${LIBUAU_AMF_SOURCE_DIR})

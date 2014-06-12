@@ -39,18 +39,31 @@
 #ifndef UAU_AMF_CORE_ENVELOPE_H
 #define UAU_AMF_CORE_ENVELOPE_H
 
-
 #include <type_traits>
 #include "envelope_fwd.h"
 #include "handlerset.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 
-//template<class T = void, class = void>
-//class Envelope;
+// Helpers
+template<class T>
+using is_inheritable = std::is_class<T>;
+
+// TODO: in future, when c++14 will become available, use std::is_final with std::is_class together
+//template<class T>
+//struct is_inheritable : std::integral_constant<bool,
+//                            std::is_class<T>::value &&
+//                            !std::is_final<T>::value> {};
+
+
+template<class T, class U = void>
+using when_ingeritable = typename std::enable_if<is_inheritable<T>::value, U>;
+
+template<class T, class U = void>
+using when_not_ingeritable = typename std::enable_if<not is_inheritable<T>::value, U>;
+
 
 template<>
 class Envelope<>{
@@ -87,28 +100,36 @@ public:
 };
 
 template<class Message>
-class Envelope<Message, typename std::enable_if<std::is_class<Message>::value>::type> : public Envelope<>, public Message {
+class Envelope<Message, typename when_ingeritable<Message>::type> : public Envelope<>, public Message { // for the future is_final
 public:
-    typedef Message type;
+    typedef typename std::remove_cv<Message>::type type;
+
+    static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
 
 public:
     template<class... Args>
     Envelope(Args&&... args) :
         Message{std::forward<Args>(args)...} {}
 
-    Message & message() {
+    Message & message()
+    {
         return *this;
     }
 
-    const Message & message() const {
+    const Message & message() const
+    {
         return *this;
     }
 };
 
 template<class Message>
-class Envelope<Message, typename std::enable_if<not std::is_class<Message>::value>::type> : public Envelope<> {
+class Envelope<Message, typename when_not_ingeritable<Message>::type> : public Envelope<> {
 public:
     typedef Message type;
+
+    static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
 
 public:
     Envelope() = default;
@@ -121,53 +142,24 @@ public:
     Envelope(Message&& msg) :
         _message(msg) {}
 
-    Message & message() & {
+    Message & message() &
+    {
         return _message;
     }
 
-    const Message & message() const & {
+    const Message & message() const &
+    {
         return _message;
     }
 
-    Message message() && {
+    Message message() &&
+    {
         return std::move(_message);
     }
 
 private:
     Message _message;
 };
-
-//template<class Message>
-//class Envelope<Message> : public Envelope<> {
-//public:
-//    Envelope() = default;
-//    Envelope(const Envelope &) = default;
-//    Envelope(Envelope &&) = default;
-
-//    Envelope & operator = (const Envelope &) = default;
-//    Envelope & operator = (Envelope &&) = default;
-
-//    Envelope(Message&& msg) :
-//        _message(msg) {}
-
-//    Message & message() & {
-//        return _message;
-//    }
-
-//    const Message & message() const & {
-//        return _message;
-//    }
-
-//    Message message() && {
-//        return std::move(_message);
-//    }
-
-//private:
-//    Message _message;
-//};
-
-//template<class T, class... Ts>
-//class Envelope<T, Ts...>;
 
 
 template<class...>
@@ -245,14 +237,31 @@ envelope_cast(E envelope) {
 } // namespace core
 } // namespace amf
 
-template<class T, class Payload = typename amf::core::apply_cvalifiers<T, typename amf::core::wrapped_type<T>::type>::type>
-bool handlerSetMatcher(const amf::core::Envelope<> *envelope) {
-    return dynamic_cast<Payload>(envelope);
+
+/**
+ * @brief HandlerSet's matcher specialization
+ */
+template<class T>
+typename amf::core::when_ingeritable<T, bool>::type
+handlerSetMatcher(const amf::core::Envelope<> * b) {
+    return dynamic_cast<
+            typename std::add_pointer<
+                typename std::add_const<T>::type
+            >::type
+           >(b);
 }
 
-///**
-// * @brief HandlerSet's matcher specialization
-// */
+template<class T>
+typename amf::core::when_not_ingeritable<T, bool>::type
+handlerSetMatcher(const amf::core::Envelope<> * b) {
+    return dynamic_cast<const amf::core::Envelope<T>*>(b);
+}
+
+//template<class T, class Payload = typename amf::core::apply_cvalifiers<T, typename amf::core::wrapped_type<T>::type>::type>
+//bool handlerSetMatcher(const amf::core::Envelope<> *envelope) {
+//    return dynamic_cast<Payload>(envelope);
+//}
+
 //template<class T>
 //typename std::enable_if<amf::core::is_envelope<T>::value, bool>::type
 //handlerSetMatcher(amf::core::Envelope<> * b) {

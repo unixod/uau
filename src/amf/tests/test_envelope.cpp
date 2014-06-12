@@ -1,10 +1,62 @@
-#include "lest/lest.hpp"
-#include "core/envelope.h"
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 #include "handlerset.h"
+#include "core/envelope.h"
 
 
 namespace amf = uau::amf;
 namespace core = amf::core;
+
+
+SCENARIO("") {
+    GIVEN("Envelope of not inheritable message class") {
+        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<int>{5}};
+
+        THEN("") {
+            REQUIRE(uau::handlerSetMatcher<int>(pElp.get()));
+        }
+
+        int i;
+        int &ref = i;
+        core::Envelope<int> sd(3);
+    }
+
+    GIVEN("Envelope of inheritable message class") {
+        class B {};
+        class D : public B {};
+        class Oth : public B {};
+
+        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<D>};
+
+        THEN("") {
+            REQUIRE(uau::handlerSetMatcher<B>(pElp.get()));
+            REQUIRE(uau::handlerSetMatcher<D>(pElp.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<Oth>(pElp.get()));
+
+//            AND_THEN("") {
+//                REQUIRE(uau::handlerSetMatcher<B &>(pElp.get()));
+//                REQUIRE(uau::handlerSetMatcher<D &>(pElp.get()));
+//                REQUIRE_FALSE(uau::handlerSetMatcher<Oth &>(pElp.get()));
+//            }
+
+            AND_THEN("") {
+                REQUIRE(uau::handlerSetMatcher<const B>(pElp.get()));
+                REQUIRE(uau::handlerSetMatcher<const D>(pElp.get()));
+                REQUIRE_FALSE(uau::handlerSetMatcher<const Oth>(pElp.get()));
+            }
+
+//            AND_THEN("") {
+//                REQUIRE(uau::handlerSetMatcher<const B &>(pElp.get()));
+//                REQUIRE(uau::handlerSetMatcher<const D &>(pElp.get()));
+//                REQUIRE_FALSE(uau::handlerSetMatcher<const Oth &>(pElp.get()));
+//            }
+        }
+    }
+}
+
+/*
+#include "lest/lest.hpp"
+
 
 
 const lest::test specification[] = {
@@ -80,3 +132,4 @@ const lest::test specification[] = {
 int main() {
     return lest::run(specification);
 }
+*/
