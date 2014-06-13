@@ -139,8 +139,9 @@ public:
     Envelope & operator = (const Envelope &) = default;
     Envelope & operator = (Envelope &&) = default;
 
-    Envelope(Message&& msg) :
-        _message(msg) {}
+    template<class... Args>
+    Envelope(Args&&... args) :
+        _message{std::forward<Args>(args)...} {}
 
     Message & message() &
     {
@@ -254,7 +255,9 @@ handlerSetMatcher(const amf::core::Envelope<> * b) {
 template<class T>
 typename amf::core::when_not_ingeritable<T, bool>::type
 handlerSetMatcher(const amf::core::Envelope<> * b) {
-    return dynamic_cast<const amf::core::Envelope<T>*>(b);
+    return dynamic_cast<
+            const amf::core::Envelope<T> *
+           >(b);
 }
 
 //template<class T, class Payload = typename amf::core::apply_cvalifiers<T, typename amf::core::wrapped_type<T>::type>::type>

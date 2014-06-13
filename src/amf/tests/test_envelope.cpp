@@ -8,128 +8,133 @@ namespace amf = uau::amf;
 namespace core = amf::core;
 
 
-SCENARIO("") {
-    GIVEN("Envelope of not inheritable message class") {
-        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<int>{5}};
+SCENARIO("Casting of Envelop which constructs from non inheritable message type") {
+    GIVEN("Non inheritable message class Msg, and Envelop constructed from it") {
+        typedef int Msg;
 
-        THEN("") {
-            REQUIRE(uau::handlerSetMatcher<int>(pElp.get()));
-        }
+        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<Msg>{5}};
+        std::unique_ptr<const core::Envelope<>> pElpConstMsg{new core::Envelope<const Msg>{5}};
+        std::unique_ptr<const core::Envelope<>> pElpVolatileMsg{new core::Envelope<volatile Msg>{5}};
+        std::unique_ptr<const core::Envelope<>> pElpCVMsg{new core::Envelope<const volatile Msg>{5}};
 
-        int i;
-        int &ref = i;
-        core::Envelope<int> sd(3);
-    }
-
-    GIVEN("Envelope of inheritable message class") {
-        class B {};
-        class D : public B {};
-        class Oth : public B {};
-
-        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<D>};
-
-        THEN("") {
-            REQUIRE(uau::handlerSetMatcher<B>(pElp.get()));
-            REQUIRE(uau::handlerSetMatcher<D>(pElp.get()));
-            REQUIRE_FALSE(uau::handlerSetMatcher<Oth>(pElp.get()));
-
-//            AND_THEN("") {
-//                REQUIRE(uau::handlerSetMatcher<B &>(pElp.get()));
-//                REQUIRE(uau::handlerSetMatcher<D &>(pElp.get()));
-//                REQUIRE_FALSE(uau::handlerSetMatcher<Oth &>(pElp.get()));
-//            }
-
-            AND_THEN("") {
-                REQUIRE(uau::handlerSetMatcher<const B>(pElp.get()));
-                REQUIRE(uau::handlerSetMatcher<const D>(pElp.get()));
-                REQUIRE_FALSE(uau::handlerSetMatcher<const Oth>(pElp.get()));
+        WHEN("try to cast to Msg") {
+            THEN("uau::handlerSetMatcher returns true") {
+                REQUIRE(uau::handlerSetMatcher<Msg>(pElp.get()));
+                REQUIRE(uau::handlerSetMatcher<const Msg>(pElpConstMsg.get()));
+                REQUIRE(uau::handlerSetMatcher<volatile Msg>(pElpVolatileMsg.get()));
+                REQUIRE(uau::handlerSetMatcher<const volatile Msg>(pElpCVMsg.get()));
             }
+        }
 
-//            AND_THEN("") {
-//                REQUIRE(uau::handlerSetMatcher<const B &>(pElp.get()));
-//                REQUIRE(uau::handlerSetMatcher<const D &>(pElp.get()));
-//                REQUIRE_FALSE(uau::handlerSetMatcher<const Oth &>(pElp.get()));
-//            }
+        WHEN("try to cast to Msg with different qualifiers") {
+            REQUIRE_FALSE(uau::handlerSetMatcher<const Msg>(pElp.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<volatile Msg>(pElp.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<const volatile Msg>(pElp.get()));
+
+            REQUIRE_FALSE(uau::handlerSetMatcher<Msg>(pElpConstMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<volatile Msg>(pElpConstMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<const volatile Msg>(pElpConstMsg.get()));
+
+            REQUIRE_FALSE(uau::handlerSetMatcher<const Msg>(pElpVolatileMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<Msg>(pElpVolatileMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<const volatile Msg>(pElpVolatileMsg.get()));
+
+            REQUIRE_FALSE(uau::handlerSetMatcher<const Msg>(pElpCVMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<volatile Msg>(pElpCVMsg.get()));
+            REQUIRE_FALSE(uau::handlerSetMatcher<Msg>(pElpCVMsg.get()));
+        }
+
+        WHEN("try to cast to other non iheritable message type") {
+            typedef char OtherMsg;
+
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
+        }
+
+        WHEN("try to cast to iheritable (non polymorphic) message type") {
+            class OtherMsg {};
+
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
+        }
+
+        WHEN("try to cast to iheritable polymorphic message type") {
+            class OtherMsg {
+            public:
+                virtual ~OtherMsg(){}
+            };
+
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
         }
     }
 }
 
-/*
-#include "lest/lest.hpp"
+SCENARIO("Casting of Envelop which constructs from inheritable (non polymorphic) message type") {
+    GIVEN("Non inheritable message class Msg, and Envelop constructed from it") {
+        class Msg {};
 
+        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<Msg>{}};
+        std::unique_ptr<const core::Envelope<>> pElpConstMsg{new core::Envelope<const Msg>{}};
+        std::unique_ptr<const core::Envelope<>> pElpVolatileMsg{new core::Envelope<volatile Msg>{}};
+        std::unique_ptr<const core::Envelope<>> pElpCVMsg{new core::Envelope<const volatile Msg>{}};
 
+        WHEN("try to cast to Msg") {
+            THEN("uau::handlerSetMatcher returns true") {
+                REQUIRE(uau::handlerSetMatcher<Msg>(pElp.get()));
+                REQUIRE(uau::handlerSetMatcher<const Msg>(pElpConstMsg.get()));
+                REQUIRE(uau::handlerSetMatcher<volatile Msg>(pElpVolatileMsg.get()));
+                REQUIRE(uau::handlerSetMatcher<const volatile Msg>(pElpCVMsg.get()));
+            }
+        }
 
-const lest::test specification[] = {
-    "Envelope traits", [] {
-        class Some {};
+        WHEN("try to cast to Msg with different qualifiers") {
+            REQUIRE(uau::handlerSetMatcher<const Msg>(pElp.get()));
+            REQUIRE(uau::handlerSetMatcher<volatile Msg>(pElp.get()));
+            REQUIRE(uau::handlerSetMatcher<const volatile Msg>(pElp.get()));
 
-        EXPECT(amf::core::is_envelope<core::Envelope<int>>::value);
-        EXPECT(amf::core::is_envelope<core::Envelope<Some>>::value);
+            REQUIRE(uau::handlerSetMatcher<Msg>(pElpConstMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<volatile Msg>(pElpConstMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<const volatile Msg>(pElpConstMsg.get()));
 
-        // const
-        EXPECT(amf::core::is_envelope<const core::Envelope<int>>::value);
-        EXPECT(amf::core::is_envelope<const core::Envelope<Some>>::value);
+            REQUIRE(uau::handlerSetMatcher<const Msg>(pElpVolatileMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<Msg>(pElpVolatileMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<const volatile Msg>(pElpVolatileMsg.get()));
 
-        // pointers
-        EXPECT(amf::core::is_envelope<core::Envelope<int> *>::value);
-        EXPECT(amf::core::is_envelope<core::Envelope<Some> *>::value);
+            REQUIRE(uau::handlerSetMatcher<const Msg>(pElpCVMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<volatile Msg>(pElpCVMsg.get()));
+            REQUIRE(uau::handlerSetMatcher<Msg>(pElpCVMsg.get()));
+        }
 
-        // reference
-        EXPECT(amf::core::is_envelope<core::Envelope<int> &>::value);
-        EXPECT(amf::core::is_envelope<core::Envelope<Some> &>::value);
-    },
+        WHEN("try to cast to other non iheritable message type") {
+            typedef char OtherMsg;
 
-    "handlerSetMatcher specialization", [] {
-//        class A {
-//        public:
-//            virtual ~A(){}
-//        };
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
+        }
 
-//        class B : public A {};
-//        class Oth {};
+        WHEN("try to cast to iheritable (non polymorphic) message type") {
+            class OtherMsg {};
 
-//        core::Envelope<> *ptrB = new core::Envelope<B>;
-//        EXPECT(uau::handlerSetMatcher<core::Envelope<B> *>(ptrB));
-//        EXPECT(!uau::handlerSetMatcher<core::Envelope<Oth> *>(ptrB));
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
+        }
 
-//        class C : public B {};
-//        core::Envelope<> *ptrC = new core::Envelope<C>;
-//        EXPECT(uau::handlerSetMatcher<core::Envelope<B> *>(ptrC));
-//        EXPECT(!uau::handlerSetMatcher<core::Envelope<Oth> *>(ptrC));
+        WHEN("try to cast to iheritable polymorphic message type") {
+            class OtherMsg {
+            public:
+                virtual ~OtherMsg(){}
+            };
 
-        //   A1  A2
-        //  / \ /
-        // B   C
-        //
-        // core::Envelope<> *pC = new core::Envelope<C>;
-        //
-        // handlerSetMatchr<core::Envelope<B> *>(pA);   // false
-        // handlerSetMatcher<core::Envelope<B> *>(pB);  // true
-        // handlerSetMatcher<core::Envelope<>>
-        //
-        struct A {};
-        struct B : public A {};
-        struct C : public B {};
-
-        class Logger {
-        public:
-            void operator ()(const std::string &str) { _log = str; }
-            std::string dump() const { auto tmp = _log; return tmp; }
-
-        private:
-            std::string _log;
-        };
-
-        Logger logIt;
-
-        uau::HandlerSet<core::Envelope<>> handlers;
-        handlers.setHandlerFor<core::Envelope<int>>(logIt, "int");
-        handlers.setHandlerFor<core::Envelope<char>>(logIt, "char");
-        handlers.setHandlerFor<core::Envelope<A>>(logIt, "A");
+            THEN("uau::handlerSetMatcher returns false") {
+                REQUIRE_FALSE(uau::handlerSetMatcher<OtherMsg>(pElp.get()));
+            }
+        }
     }
-};
-
-int main() {
-    return lest::run(specification);
 }
-*/
+
