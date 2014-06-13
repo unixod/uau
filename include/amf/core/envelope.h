@@ -57,7 +57,6 @@ using is_inheritable = std::is_class<T>;
 //                            std::is_class<T>::value &&
 //                            !std::is_final<T>::value> {};
 
-
 template<class T, class U = void>
 using when_ingeritable = typename std::enable_if<is_inheritable<T>::value, U>;
 
@@ -102,10 +101,13 @@ public:
 template<class Message>
 class Envelope<Message, typename when_ingeritable<Message>::type> : public Envelope<>, public Message { // for the future is_final
 public:
-    typedef typename std::remove_cv<Message>::type type;
+    typedef Message type;
 
     static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
     static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::integral_constant<bool,
+                    std::is_const<type>::value ||
+                    std::is_volatile<type>::value>::value, "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
 
 public:
     template<class... Args>
@@ -130,6 +132,9 @@ public:
 
     static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
     static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::integral_constant<bool,
+                    std::is_const<type>::value ||
+                    std::is_volatile<type>::value>::value, "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
 
 public:
     Envelope() = default;
@@ -240,11 +245,13 @@ envelope_cast(E envelope) {
 
 
 /**
- * @brief HandlerSet's matcher specialization
+ * @brief HandlerSet's matcher specializations
  */
 template<class T>
 typename amf::core::when_ingeritable<T, bool>::type
 handlerSetMatcher(const amf::core::Envelope<> * b) {
+    sizeof(amf::core::Envelope<T>); // turn on assertions
+
     return dynamic_cast<
             typename std::add_pointer<
                 typename std::add_const<T>::type
@@ -259,23 +266,6 @@ handlerSetMatcher(const amf::core::Envelope<> * b) {
             const amf::core::Envelope<T> *
            >(b);
 }
-
-//template<class T, class Payload = typename amf::core::apply_cvalifiers<T, typename amf::core::wrapped_type<T>::type>::type>
-//bool handlerSetMatcher(const amf::core::Envelope<> *envelope) {
-//    return dynamic_cast<Payload>(envelope);
-//}
-
-//template<class T>
-//typename std::enable_if<amf::core::is_envelope<T>::value, bool>::type
-//handlerSetMatcher(amf::core::Envelope<> * b) {
-//    return dynamic_cast<typename amf::core::wrapped_type<T>::type *>(b);
-//}
-
-//template<class T>
-//typename std::enable_if<amf::core::is_envelope<T>::value, bool>::type
-//handlerSetMatcher(const amf::core::Envelope<> * b) {
-//    return dynamic_cast<const typename amf::core::wrapped_type<T>::type *>(b);
-//}
 
 } // namespace uau
 
