@@ -2,7 +2,8 @@
 #include "message_queue.h"
 #include "core/envelope.h"
 
-namespace core = uau::amf::core;
+namespace amf = uau::amf;
+namespace core = amf::core;
 
 uau::amf::MessageQueue::~MessageQueue()
 {
@@ -11,7 +12,7 @@ uau::amf::MessageQueue::~MessageQueue()
     _cond.notify_all();
 }
 
-void uau::amf::MessageQueue::push(std::shared_ptr<core::Envelope<>> msg)
+void amf::MessageQueue::push(Message msg)
 {
     std::lock_guard<std::mutex> lck(_mx);
 
@@ -19,7 +20,7 @@ void uau::amf::MessageQueue::push(std::shared_ptr<core::Envelope<>> msg)
     _cond.notify_all();
 }
 
-std::shared_ptr<core::Envelope<>> uau::amf::MessageQueue::waitAndPop()
+amf::MessageQueue::Message amf::MessageQueue::waitAndPop()
 {
     std::unique_lock<std::mutex> lck(_mx);
 
@@ -27,7 +28,7 @@ std::shared_ptr<core::Envelope<>> uau::amf::MessageQueue::waitAndPop()
         return !_q.empty() || _destruction;
     });
 
-    std::shared_ptr<core::Envelope<>> msg;
+    Message msg;
     if(!_destruction) {
         msg = std::move(_q.front());
         _q.pop();
@@ -38,11 +39,11 @@ std::shared_ptr<core::Envelope<>> uau::amf::MessageQueue::waitAndPop()
     return msg;
 }
 
-std::shared_ptr<core::Envelope<>> uau::amf::MessageQueue::tryPop()
+amf::MessageQueue::Message amf::MessageQueue::tryPop()
 {
     std::lock_guard<std::mutex> lck(_mx);
 
-    std::shared_ptr<core::Envelope<>> msg;
+    Message msg;
 
     if(!_q.empty()) {
         msg = std::move(_q.front());

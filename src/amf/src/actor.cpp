@@ -14,17 +14,17 @@ amf::Actor::Actor(std::unique_ptr<amf::ActorPrivate> d) :
 
 amf::Actor::~Actor() {}
 
-void amf::Actor::push(Id /*not_used*/, std::shared_ptr<core::Envelope<>> msg)
+void amf::Actor::push(Id /*not_used*/, AbstractActor::Message msg)
 {
     d_ptr->inputQueue.push(msg);
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::pull()
+core::AbstractActor::Message amf::Actor::pull()
 {
     return d_ptr->outputQueue.waitAndPop();
 }
 
-std::shared_ptr<core::Envelope<>> amf::Actor::tryPull()
+core::AbstractActor::Message amf::Actor::tryPull()
 {
     return d_ptr->outputQueue.tryPop();
 }
@@ -64,12 +64,12 @@ bool amf::Actor::tryActivate()
     return activated;
 }
 
-std::shared_ptr<const core::Envelope<>> amf::Actor::message() const
+core::AbstractActor::Message amf::Actor::message() const
 {
     return d_ptr->message;
 }
 
-void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg)
+void amf::Actor::sendEnvelope(AbstractActor::Message &&msg)
 {
   d_ptr->outputQueue.push(std::move(msg));
 }

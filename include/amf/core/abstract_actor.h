@@ -49,13 +49,14 @@ namespace core {
 class AbstractActor {
 public:
     class Id;
+    typedef std::shared_ptr<const Envelope<>> Message;
 
 public:
     virtual ~AbstractActor() {}
 
-    virtual void push(Id src, std::shared_ptr<Envelope<>>) = 0;     /*concurrent*/
-    virtual std::shared_ptr<Envelope<>> pull() = 0;                 /*concurrent*/
-    virtual std::shared_ptr<Envelope<>> tryPull() = 0;              /*concurrent*/
+    virtual void push(Id src, Message) = 0;     /*concurrent*/
+    virtual Message pull() = 0;                 /*concurrent*/
+    virtual Message tryPull() = 0;              /*concurrent*/
 
     virtual void activate() = 0;
     virtual bool tryActivate() = 0;

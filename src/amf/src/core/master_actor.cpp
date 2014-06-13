@@ -5,7 +5,7 @@
 
 namespace core = uau::amf::core;
 
-void core::MasterActor::push(Id id, std::shared_ptr<Envelope<>> msg)
+void core::MasterActor::push(Id id, core::AbstractActor::Message msg)
 {
     const core::messages::SystemMessage d;
     core::envelope_cast<const core::messages::SystemMessage &>(d);
@@ -20,11 +20,11 @@ void core::MasterActor::push(Id id, std::shared_ptr<Envelope<>> msg)
 //    }
 }
 
-std::shared_ptr<core::Envelope<>> core::MasterActor::pull()
+core::AbstractActor::Message core::MasterActor::pull()
 {
 }
 
-std::shared_ptr<core::Envelope<>> core::MasterActor::tryPull()
+core::AbstractActor::Message core::MasterActor::tryPull()
 {
 }
 

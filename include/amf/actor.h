@@ -69,29 +69,31 @@ protected:
     }
 
     template<class T>
-    void send(T &&message) {
-        // FIXME: since C++14 use std::make_unique
-        std::unique_ptr<core::Envelope<T>> envelope{new core::Envelope<T>{std::forward<T>(message)}};
-        sendEnvelope(std::move(envelope));
+    void send(T &&payload) {
+        sendEnvelope(
+            std::make_shared<const core::Envelope<T>>(
+                std::forward<T>(payload)
+            )
+        );
     }
 
     /**
      * @brief get received message
      * @return received message
      */
-    std::shared_ptr<const core::Envelope<>> message() const;
+    AbstractActor::Message message() const;
 
 private:
     // core::AbstractActor //
-    void push(AbstractActor::Id, std::shared_ptr<core::Envelope<>>) final override; /*concurrent*/
-    std::shared_ptr<core::Envelope<>> pull() final override;                        /*concurrent*/
-    std::shared_ptr<core::Envelope<>> tryPull() final override;                     /*concurrent*/
+    void push(AbstractActor::Id, AbstractActor::Message) final override;    /*concurrent*/
+    AbstractActor::Message pull() final override;                           /*concurrent*/
+    AbstractActor::Message tryPull() final override;                        /*concurrent*/
 
     void activate() final override;                                         // blocks the current thread until the input queue is empty
     bool tryActivate() final override;
 
 private:
-    void sendEnvelope(std::unique_ptr<core::Envelope<>>);
+    void sendEnvelope(AbstractActor::Message &&);
     // TODO: move this member to private class
     HandlerSet<core::Envelope<>> _handler;
 

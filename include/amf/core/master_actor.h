@@ -48,9 +48,9 @@ namespace core {
 
 class MasterActor : public AbstractActor {
 private:
-    void push(AbstractActor::Id, std::shared_ptr<Envelope<>>) override; /*concurrent*/
-    std::shared_ptr<Envelope<>> pull() override;                        /*concurrent*/
-    std::shared_ptr<Envelope<>> tryPull() override;                     /*concurrent*/
+    void push(AbstractActor::Id, AbstractActor::Message) override;  /*concurrent*/
+    AbstractActor::Message pull() override;                         /*concurrent*/
+    AbstractActor::Message tryPull() override;                      /*concurrent*/
 
     void activate() override;
     bool tryActivate() override;

@@ -98,10 +98,10 @@ public:
     virtual ~Envelope() {}
 };
 
-template<class Message>
-class Envelope<Message, typename when_ingeritable<Message>::type> : public Envelope<>, public Message { // for the future is_final
+template<class Payload>
+class Envelope<Payload, typename when_ingeritable<Payload>::type> : public Envelope<>, public Payload { // for the future is_final
 public:
-    typedef Message type;
+    typedef Payload type;
 
     static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
     static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
@@ -112,23 +112,23 @@ public:
 public:
     template<class... Args>
     Envelope(Args&&... args) :
-        Message{std::forward<Args>(args)...} {}
+        Payload{std::forward<Args>(args)...} {}
 
-    Message & message()
+    Payload & payload()
     {
         return *this;
     }
 
-    const Message & message() const
+    const Payload & payload() const
     {
         return *this;
     }
 };
 
-template<class Message>
-class Envelope<Message, typename when_not_ingeritable<Message>::type> : public Envelope<> {
+template<class Payload>
+class Envelope<Payload, typename when_not_ingeritable<Payload>::type> : public Envelope<> {
 public:
-    typedef Message type;
+    typedef Payload type;
 
     static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
     static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
@@ -146,25 +146,25 @@ public:
 
     template<class... Args>
     Envelope(Args&&... args) :
-        _message{std::forward<Args>(args)...} {}
+        _payload{std::forward<Args>(args)...} {}
 
-    Message & message() &
+    Payload & payload() &
     {
-        return _message;
+        return _payload;
     }
 
-    const Message & message() const &
+    const Payload & payload() const &
     {
-        return _message;
+        return _payload;
     }
 
-    Message message() &&
+    Payload payload() &&
     {
-        return std::move(_message);
+        return std::move(_payload);
     }
 
 private:
-    Message _message;
+    Payload _payload;
 };
 
 

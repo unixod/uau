@@ -43,7 +43,7 @@ namespace uau {
 namespace amf {
 namespace core {
 
-template<class T = void, class = void>
+template<class Payload = void, class = void>
 class Envelope;
 
 } // namespace core
