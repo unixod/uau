@@ -186,7 +186,7 @@ public:
         _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
+        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
             _hnd(msg);
             return true;
         }
@@ -222,7 +222,7 @@ public:
         Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
+        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
             Parent::_hnd(msg);
             return true;
         }
