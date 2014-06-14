@@ -83,6 +83,36 @@ protected:
      */
     AbstractActor::Message message() const;
 
+    template<class T>
+    T messagePayload() {
+//        return message()->payload<T>();
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_pointer<T>::value>::value, "only const pointers are allowed");
+
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_reference<T>::value>::value, "only const reference are allowed");
+
+//        core::Envelope<
+//                typename std::remove_pointer<
+//                    typename std::remove_reference<
+//                        typename std::remove_cv<T>::type
+//                    >::type
+//                >::type>
+    }
+
+//    template<class T>
+//    typename amf::core::when_not_ingeritable<T, T>::type messagePayload() {
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_pointer<T>::value>::value, "only const pointers are allowed");
+
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_reference<T>::value>::value, "only const reference are allowed");
+//    }
+
 private:
     // core::AbstractActor //
     void push(AbstractActor::Id, AbstractActor::Message) final override;    /*concurrent*/

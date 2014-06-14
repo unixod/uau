@@ -58,15 +58,70 @@ using is_inheritable = std::is_class<T>;
 //                            !std::is_final<T>::value> {};
 
 template<class T, class U = void>
-using when_ingeritable = typename std::enable_if<is_inheritable<T>::value, U>;
+using when_inheritable = typename std::enable_if<is_inheritable<T>::value, U>;
 
 template<class T, class U = void>
-using when_not_ingeritable = typename std::enable_if<not is_inheritable<T>::value, U>;
+using when_not_inheritable = typename std::enable_if<not is_inheritable<T>::value, U>;
 
 
 template<>
 class Envelope<>{
 public:
+    template<class T>
+    typename when_inheritable<T, T>::type
+    payload() const {
+        static_assert(std::integral_constant<bool,
+                          std::is_pointer<T>::value ||
+                          std::is_reference<T>::value>::value,
+                      "T is inheritable type, only references or pointers are allowed for inheritable types");
+        static_assert(std::is_const<typename
+                        std::remove_reference<typename
+                            std::remove_pointer<T>::type>::type>::value,
+                      "only const pointers and references are allowed");
+
+        return dynamic_cast<T>(*this);
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_pointer<T>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_pointer<T>::type>::value,
+                      "only const pointers are allowed");
+
+        typedef Envelope<typename
+                    std::remove_cv<T>::type> E;
+
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return &envelope->_payload;
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<class T, class... Args>
+    typename std::enable_if<!std::is_pointer<T>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload(Args&&... args) const {
+        static_assert(std::integral_constant<bool,
+                        !std::is_reference<T>::value ||
+                        std::is_const<typename
+                            std::remove_reference<T>::type>::value>::value,
+                      "only const references are allowed");
+
+        typedef Envelope<typename
+                    std::remove_cv<typename
+                        std::remove_reference<typename
+                            std::remove_pointer<T>::type>::type>::type> E;
+
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return envelope->_payload;
+        } else {
+            return T{std::forward<Args>(args)...};
+        }
+    }
+
     template<class T>
     const T * is() {
 //        if(auto content = dynamic_cast<
@@ -99,42 +154,40 @@ public:
 };
 
 template<class Payload>
-class Envelope<Payload, typename when_ingeritable<Payload>::type> : public Envelope<>, public Payload { // for the future is_final
+class Envelope<Payload, typename when_inheritable<Payload>::type>
+        : public Envelope<>, public Payload { // for the future is_final
 public:
     typedef Payload type;
 
-    static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
-    static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::is_pointer<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be reference type");
     static_assert(!std::integral_constant<bool,
                     std::is_const<type>::value ||
-                    std::is_volatile<type>::value>::value, "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
+                    std::is_volatile<type>::value>::value,
+                  "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
 
 public:
     template<class... Args>
     Envelope(Args&&... args) :
         Payload{std::forward<Args>(args)...} {}
-
-    Payload & payload()
-    {
-        return *this;
-    }
-
-    const Payload & payload() const
-    {
-        return *this;
-    }
 };
 
 template<class Payload>
-class Envelope<Payload, typename when_not_ingeritable<Payload>::type> : public Envelope<> {
+class Envelope<Payload, typename when_not_inheritable<Payload>::type>
+        : public Envelope<> {
 public:
     typedef Payload type;
 
-    static_assert(!std::is_pointer<type>::value, "uau::amf::core::Envelope<T>, T must not be pointer type");
-    static_assert(!std::is_reference<type>::value, "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::is_pointer<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be reference type");
     static_assert(!std::integral_constant<bool,
                     std::is_const<type>::value ||
-                    std::is_volatile<type>::value>::value, "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
+                    std::is_volatile<type>::value>::value,
+                  "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
 
 public:
     Envelope() = default;
@@ -148,22 +201,7 @@ public:
     Envelope(Args&&... args) :
         _payload{std::forward<Args>(args)...} {}
 
-    Payload & payload() &
-    {
-        return _payload;
-    }
-
-    const Payload & payload() const &
-    {
-        return _payload;
-    }
-
-    Payload payload() &&
-    {
-        return std::move(_payload);
-    }
-
-private:
+public:
     Payload _payload;
 };
 
@@ -248,23 +286,19 @@ envelope_cast(E envelope) {
  * @brief HandlerSet's matcher specializations
  */
 template<class T>
-typename amf::core::when_ingeritable<T, bool>::type
+typename amf::core::when_inheritable<T, bool>::type
 handlerSetMatcher(const amf::core::Envelope<> * b) {
     sizeof(amf::core::Envelope<T>); // turn on assertions
 
-    return dynamic_cast<
-            typename std::add_pointer<
-                typename std::add_const<T>::type
-            >::type
-           >(b);
+    return dynamic_cast<typename
+                std::add_pointer<typename
+                    std::add_const<T>::type>::type>(b);
 }
 
 template<class T>
-typename amf::core::when_not_ingeritable<T, bool>::type
+typename amf::core::when_not_inheritable<T, bool>::type
 handlerSetMatcher(const amf::core::Envelope<> * b) {
-    return dynamic_cast<
-            const amf::core::Envelope<T> *
-           >(b);
+    return dynamic_cast<const amf::core::Envelope<T> *>(b);
 }
 
 } // namespace uau

@@ -142,3 +142,29 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
     }
 }
 
+SCENARIO("Trying to get valid payload") {
+    GIVEN("Envelope which holds non-inheritable type, with trivial constructor") {
+        int payload = 3;
+
+        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<int>(payload)};
+
+        WHEN("Trying to cast to same type") {
+            THEN("it's ok") {
+                REQUIRE(pElp->payload<int>() == payload);
+            }
+        }
+
+
+        WHEN("Trying to cast to other type") {
+            THEN("result is default constructed type") {
+                REQUIRE_FALSE(pElp->payload<char>() == payload);
+            }
+        }
+
+        REQUIRE(pElp->payload<const int>() == payload);
+        REQUIRE(pElp->payload<const volatile int>() == payload);
+        REQUIRE(pElp->payload<const int &>() == payload);
+//        REQUIRE(pElp->payload<int &>() == payload);
+    }
+}
+
