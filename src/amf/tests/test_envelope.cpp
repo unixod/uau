@@ -142,29 +142,88 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
     }
 }
 
-SCENARIO("Trying to get valid payload") {
-    GIVEN("Envelope which holds non-inheritable type, with trivial constructor") {
+SCENARIO("Trying to get payload") {
+    GIVEN("Envelope holds non-inheritable payload of type T") {
         int payload = 3;
 
-        std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<int>(payload)};
+        std::unique_ptr<const core::Envelope<>> pElp{
+            new core::Envelope<int>(payload)
+        };
 
-        WHEN("Trying to cast to same type") {
-            THEN("it's ok") {
-                REQUIRE(pElp->payload<int>() == payload);
+        WHEN("Trying to get payload by value") {
+            AND_WHEN("Assumption about payload type is met") {
+                auto pPayload = pElp->payload<int>();
+
+                THEN("Envelope::payload returns const reference to payload") {
+                    REQUIRE(pPayload == payload);
+
+                    AND_THEN("type qualifiers don't affect the matching") {
+                        auto pPayload1 = pElp->payload<const int>();
+                        auto pPayload2 = pElp->payload<volatile int>();
+                        auto pPayload3 = pElp->payload<const volatile int>();
+
+                        REQUIRE(pPayload1 == payload);
+                        REQUIRE(pPayload2 == payload);
+                        REQUIRE(pPayload3 == payload);
+                    }
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                auto pPayload = pElp->payload<char>(111);
+
+                THEN("Envelope::payload returns constructed assumed type") {
+                    REQUIRE(pPayload == 111);
+
+                    AND_THEN("type qualifiers don't affect the matching") {
+                        auto pPayload1 = pElp->payload<const char>(123);
+                        auto pPayload2 = pElp->payload<volatile char>(123);
+                        auto pPayload3 = pElp->payload<const volatile char>(123);
+
+                        REQUIRE(pPayload1 == 123);
+                        REQUIRE(pPayload2 == 123);
+                        REQUIRE(pPayload3 == 123);
+                    }
+                }
             }
         }
 
+        WHEN("Trying to get reference to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                auto pPayload = pElp->payload<const int &>();
 
-        WHEN("Trying to cast to other type") {
-            THEN("result is default constructed type") {
-                REQUIRE_FALSE(pElp->payload<char>() == payload);
+                THEN("Envelope::payload returns const reference to payload") {
+                    REQUIRE(pPayload == payload);
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                auto pPayload = pElp->payload<const char &>(111);
+
+                THEN("Envelope::payload returns reference to constructed assumed type") {
+                    REQUIRE(pPayload == 111);
+                }
             }
         }
 
-        REQUIRE(pElp->payload<const int>() == payload);
-        REQUIRE(pElp->payload<const volatile int>() == payload);
-        REQUIRE(pElp->payload<const int &>() == payload);
-//        REQUIRE(pElp->payload<int &>() == payload);
+        WHEN("Trying to get pointer to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                auto pPayload = pElp->payload<const int *>();
+
+                THEN("Envelope::payload returns valid pointer") {
+                    REQUIRE(pPayload != nullptr);
+                    REQUIRE(*pPayload == payload);
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                auto pPayload = pElp->payload<const char *>();
+
+                THEN("Envelope::payload returns nullptr") {
+                    REQUIRE(pPayload == nullptr);
+                }
+            }
+        }
     }
 }
 

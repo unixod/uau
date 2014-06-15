@@ -86,12 +86,12 @@ public:
     typename std::enable_if<std::is_pointer<T>::value,
         typename when_not_inheritable<T, T>::type>::type
     payload() const {
-        static_assert(std::is_const<typename
-                        std::remove_pointer<T>::type>::value,
+        typedef typename std::remove_pointer<T>::type P;
+
+        static_assert(std::is_const<P>::value,
                       "only const pointers are allowed");
 
-        typedef Envelope<typename
-                    std::remove_cv<T>::type> E;
+        typedef Envelope<typename std::remove_cv<P>::type> E;
 
         if (auto envelope = dynamic_cast<const E *>(this)) {
             return &envelope->_payload;
