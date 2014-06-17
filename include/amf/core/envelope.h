@@ -49,7 +49,9 @@ namespace core {
 
 // Helpers
 template<class T>
-using is_inheritable = std::is_class<T>;
+using is_inheritable = std::is_class<typename
+                        std::remove_pointer<typename
+                            std::remove_reference<T>::type>::type>;
 
 // TODO: in future, when c++14 will become available, use std::is_final with std::is_class together
 //template<class T>
@@ -68,16 +70,23 @@ template<>
 class Envelope<>{
 public:
     template<class T>
-    typename when_inheritable<T, T>::type
+    typename std::enable_if<std::is_pointer<T>::value,
+        typename when_inheritable<T, T>::type>::type
     payload() const {
-        static_assert(std::integral_constant<bool,
-                          std::is_pointer<T>::value ||
-                          std::is_reference<T>::value>::value,
-                      "T is inheritable type, only references or pointers are allowed for inheritable types");
         static_assert(std::is_const<typename
-                        std::remove_reference<typename
-                            std::remove_pointer<T>::type>::type>::value,
-                      "only const pointers and references are allowed");
+                        std::remove_pointer<T>::type>::value,
+                      "only const pointers are allowed");
+
+        return dynamic_cast<T>(this);
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_reference<T>::value,
+        typename when_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_reference<T>::type>::value,
+                      "only const references or pointers are allowed for inheritable types");
 
         return dynamic_cast<T>(*this);
     }
@@ -86,12 +95,13 @@ public:
     typename std::enable_if<std::is_pointer<T>::value,
         typename when_not_inheritable<T, T>::type>::type
     payload() const {
-        typedef typename std::remove_pointer<T>::type P;
-
-        static_assert(std::is_const<P>::value,
+        static_assert(std::is_const<typename
+                        std::remove_pointer<T>::type>::value,
                       "only const pointers are allowed");
 
-        typedef Envelope<typename std::remove_cv<P>::type> E;
+        typedef Envelope<typename
+                    std::remove_cv<typename
+                        std::remove_pointer<T>::type>::type> E;
 
         if (auto envelope = dynamic_cast<const E *>(this)) {
             return &envelope->_payload;
@@ -100,54 +110,39 @@ public:
         }
     }
 
-    template<class T, class... Args>
-    typename std::enable_if<!std::is_pointer<T>::value,
+    template<class T>
+    typename std::enable_if<std::is_reference<T>::value,
         typename when_not_inheritable<T, T>::type>::type
-    payload(Args&&... args) const {
-        static_assert(std::integral_constant<bool,
-                        !std::is_reference<T>::value ||
-                        std::is_const<typename
-                            std::remove_reference<T>::type>::value>::value,
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_reference<T>::type>::value,
                       "only const references are allowed");
 
         typedef Envelope<typename
                     std::remove_cv<typename
-                        std::remove_reference<typename
-                            std::remove_pointer<T>::type>::type>::type> E;
+                        std::remove_reference<T>::type>::type> E;
 
         if (auto envelope = dynamic_cast<const E *>(this)) {
             return envelope->_payload;
         } else {
-            return T{std::forward<Args>(args)...};
+            throw std::bad_cast{};
         }
     }
 
-    template<class T>
-    const T * is() {
-//        if(auto content = dynamic_cast<
-//                            typename std::add_pointer<
-//                                Envelope<T>
-//                            >::type
-//                           >(this)) {
-//            return &content->message();
-//        } else {
-            return nullptr;
-//        }
-    }
+    template<class T, class... Args>
+    typename std::enable_if<std::integral_constant<bool,
+                                !std::is_pointer<T>::value &&
+                                !std::is_reference<T>::value>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload(Args&&... args) const {
+        typedef Envelope<typename
+                    std::remove_cv<T>::type> E;
 
-    template<class T>
-    const T * is() const {
-//        if(auto content = dynamic_cast<
-//                            typename std::add_pointer<
-//                                typename std::add_const<
-//                                    Envelope<T>
-//                                >::type
-//                            >::type
-//                           >(this)) {
-//            return &content->message();
-//        } else {
-            return nullptr;
-//        }
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return envelope->_payload;
+        } else {
+            return {std::forward<Args>(args)...};
+        }
     }
 
     virtual ~Envelope() {}
@@ -171,7 +166,7 @@ public:
 public:
     template<class... Args>
     Envelope(Args&&... args) :
-        Payload{std::forward<Args>(args)...} {}
+        Payload(std::forward<Args>(args)...) {}
 };
 
 template<class Payload>

@@ -8,19 +8,19 @@ namespace amf = uau::amf;
 namespace core = amf::core;
 
 
-SCENARIO("Casting of Envelop which constructs from non inheritable message type") {
-    GIVEN("Non inheritable message class Msg, and Envelop constructed from it") {
+SCENARIO("Casting of Envelop which holds non inheritable payload type") {
+    GIVEN("Non inheritable payload type Msg, and Envelop constructed from it") {
         typedef int Msg;
 
         std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<Msg>{5}};
 
-        WHEN("try to cast to Msg") {
+        WHEN("Try to cast to Msg") {
             THEN("uau::handlerSetMatcher returns true") {
                 REQUIRE(uau::handlerSetMatcher<Msg>(pElp.get()));
             }
         }
 
-        WHEN("try to cast to other non iheritable message type") {
+        WHEN("Try to cast to other non iheritable message type") {
             typedef char OtherMsg;
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -28,7 +28,7 @@ SCENARIO("Casting of Envelop which constructs from non inheritable message type"
             }
         }
 
-        WHEN("try to cast to iheritable (non polymorphic) message type") {
+        WHEN("Try to cast to iheritable (non polymorphic) message type") {
             class OtherMsg {};
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -36,7 +36,7 @@ SCENARIO("Casting of Envelop which constructs from non inheritable message type"
             }
         }
 
-        WHEN("try to cast to iheritable polymorphic message type") {
+        WHEN("Try to cast to iheritable polymorphic message type") {
             class OtherMsg {
             public:
                 virtual ~OtherMsg(){}
@@ -49,19 +49,19 @@ SCENARIO("Casting of Envelop which constructs from non inheritable message type"
     }
 }
 
-SCENARIO("Casting of Envelop which constructs from inheritable (non polymorphic) message type") {
-    GIVEN("Non inheritable message class Msg, and Envelop constructed from it") {
+SCENARIO("Casting of Envelop which holds inheritable (non polymorphic) payload type") {
+    GIVEN("Inheritable (not polymorphic) payload type Msg, and Envelop constructed from it") {
         class Msg {};
 
         std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<Msg>{}};
 
-        WHEN("try to cast to Msg") {
+        WHEN("Try to cast to Msg") {
             THEN("uau::handlerSetMatcher returns true") {
                 REQUIRE(uau::handlerSetMatcher<Msg>(pElp.get()));
             }
         }
 
-        WHEN("try to cast to other non iheritable message type") {
+        WHEN("Try to cast to other non iheritable message type") {
             typedef char OtherMsg;
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -69,7 +69,7 @@ SCENARIO("Casting of Envelop which constructs from inheritable (non polymorphic)
             }
         }
 
-        WHEN("try to cast to iheritable (non polymorphic) message type") {
+        WHEN("Try to cast to iheritable (non polymorphic) message type") {
             class OtherMsg {};
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -77,7 +77,7 @@ SCENARIO("Casting of Envelop which constructs from inheritable (non polymorphic)
             }
         }
 
-        WHEN("try to cast to iheritable polymorphic message type") {
+        WHEN("Try to cast to iheritable polymorphic message type") {
             class OtherMsg {
             public:
                 virtual ~OtherMsg(){}
@@ -90,8 +90,8 @@ SCENARIO("Casting of Envelop which constructs from inheritable (non polymorphic)
     }
 }
 
-SCENARIO("Casting of Envelop which constructs from inheritable polymorphic message type") {
-    GIVEN("Non inheritable message class Msg, and Envelop constructed from it") {
+SCENARIO("Casting of Envelop which holds from inheritable polymorphic payload type") {
+    GIVEN("Inheritable payload type  Msg, and Envelop constructed from it") {
         class BaseMsg {
         public:
             virtual ~BaseMsg() {}
@@ -101,19 +101,19 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
 
         std::unique_ptr<const core::Envelope<>> pElp{new core::Envelope<Msg>{}};
 
-        WHEN("try to cast to Msg") {
+        WHEN("Try to cast to Msg") {
             THEN("uau::handlerSetMatcher returns true") {
                 REQUIRE(uau::handlerSetMatcher<Msg>(pElp.get()));
             }
         }
 
-        WHEN("try to cast to class of the Msg") {
+        WHEN("Try to cast to class of the Msg") {
             THEN("uau::handlerSetMatcher returns true") {
                 REQUIRE(uau::handlerSetMatcher<BaseMsg>(pElp.get()));
             }
         }
 
-        WHEN("try to cast to other non iheritable message type") {
+        WHEN("Try to cast to other non iheritable message type") {
             typedef char OtherMsg;
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -121,7 +121,7 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
             }
         }
 
-        WHEN("try to cast to iheritable (non polymorphic) message type") {
+        WHEN("Try to cast to iheritable (non polymorphic) message type") {
             class OtherMsg {};
 
             THEN("uau::handlerSetMatcher returns false") {
@@ -129,7 +129,7 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
             }
         }
 
-        WHEN("try to cast to iheritable polymorphic message type") {
+        WHEN("Try to cast to iheritable polymorphic message type") {
             class OtherMsg {
             public:
                 virtual ~OtherMsg(){}
@@ -142,25 +142,26 @@ SCENARIO("Casting of Envelop which constructs from inheritable polymorphic messa
     }
 }
 
-SCENARIO("Trying to get payload") {
-    GIVEN("Envelope holds non-inheritable payload of type T") {
-        int payload = 3;
+SCENARIO("Getting a payload") {
+    GIVEN("Envelope of non-inheritable payload type") {
+        typedef int Msg;
+        Msg payload = 3;
 
         std::unique_ptr<const core::Envelope<>> pElp{
-            new core::Envelope<int>(payload)
+            new core::Envelope<Msg>(payload)
         };
 
         WHEN("Trying to get payload by value") {
             AND_WHEN("Assumption about payload type is met") {
-                auto pPayload = pElp->payload<int>();
+                auto pPayload = pElp->payload<Msg>();
 
-                THEN("Envelope::payload returns const reference to payload") {
+                THEN("Envelope::payload returns payload by value") {
                     REQUIRE(pPayload == payload);
 
                     AND_THEN("type qualifiers don't affect the matching") {
-                        auto pPayload1 = pElp->payload<const int>();
-                        auto pPayload2 = pElp->payload<volatile int>();
-                        auto pPayload3 = pElp->payload<const volatile int>();
+                        auto pPayload1 = pElp->payload<const Msg>();
+                        auto pPayload2 = pElp->payload<volatile Msg>();
+                        auto pPayload3 = pElp->payload<const volatile Msg>();
 
                         REQUIRE(pPayload1 == payload);
                         REQUIRE(pPayload2 == payload);
@@ -172,7 +173,7 @@ SCENARIO("Trying to get payload") {
             AND_WHEN("Assumption about payload type is not met") {
                 auto pPayload = pElp->payload<char>(111);
 
-                THEN("Envelope::payload returns constructed assumed type") {
+                THEN("Envelope::payload returns instance of expected type") {
                     REQUIRE(pPayload == 111);
 
                     AND_THEN("type qualifiers don't affect the matching") {
@@ -190,7 +191,7 @@ SCENARIO("Trying to get payload") {
 
         WHEN("Trying to get reference to payload") {
             AND_WHEN("Assumption about payload type is met") {
-                auto pPayload = pElp->payload<const int &>();
+                auto pPayload = pElp->payload<const Msg &>();
 
                 THEN("Envelope::payload returns const reference to payload") {
                     REQUIRE(pPayload == payload);
@@ -198,21 +199,133 @@ SCENARIO("Trying to get payload") {
             }
 
             AND_WHEN("Assumption about payload type is not met") {
-                auto pPayload = pElp->payload<const char &>(111);
-
-                THEN("Envelope::payload returns reference to constructed assumed type") {
-                    REQUIRE(pPayload == 111);
+                THEN("Envelope::payload throws the std::bad_cast exception") {
+                    REQUIRE_THROWS_AS(pElp->payload<const char &>(), std::bad_cast);
                 }
             }
         }
 
         WHEN("Trying to get pointer to payload") {
             AND_WHEN("Assumption about payload type is met") {
-                auto pPayload = pElp->payload<const int *>();
+                auto pPayload = pElp->payload<const Msg *>();
 
                 THEN("Envelope::payload returns valid pointer") {
                     REQUIRE(pPayload != nullptr);
                     REQUIRE(*pPayload == payload);
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                auto pPayload = pElp->payload<const char *>();
+
+                THEN("Envelope::payload returns nullptr") {
+                    REQUIRE(pPayload == nullptr);
+                }
+            }
+        }
+    }
+
+    GIVEN("Envelope of inheritable (non polymorphic) payload type") {
+        struct Msg {
+            int data;
+        };
+        Msg payload{3};
+
+        std::unique_ptr<const core::Envelope<>> pElp{
+            new core::Envelope<Msg>(payload)
+        };
+
+        WHEN("Trying to get reference to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                const Msg & refPayload = pElp->payload<const Msg &>();
+
+                THEN("Envelope::payload returns const reference to payload") {
+                    REQUIRE(refPayload.data == payload.data);
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                THEN("Envelope::payload throws the std::bad_cast exception") {
+                    REQUIRE_THROWS_AS(pElp->payload<const char &>(), std::bad_cast);
+                }
+            }
+        }
+
+        WHEN("Trying to get pointer to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                auto pPayload = pElp->payload<const Msg *>();
+
+                THEN("Envelope::payload returns valid pointer") {
+                    REQUIRE(pPayload != nullptr);
+                    REQUIRE(pPayload->data == payload.data);
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                auto pPayload = pElp->payload<const char *>();
+
+                THEN("Envelope::payload returns nullptr") {
+                    REQUIRE(pPayload == nullptr);
+                }
+            }
+        }
+    }
+
+    GIVEN("Envelope of inheritable (polymorphic) payload type") {
+        class BaseMsg {
+        public:
+            BaseMsg(int data)
+                : _data{data} {}
+
+            virtual ~BaseMsg() {}
+
+            int data() const {
+                return _data;
+            }
+
+        private:
+            int _data;
+        };
+
+        struct Msg : public BaseMsg {
+            Msg(int data) :
+                BaseMsg(data) {}
+        };
+
+        Msg payload{3};
+
+        std::unique_ptr<const core::Envelope<>> pElp{
+            new core::Envelope<Msg>(payload)
+        };
+
+        WHEN("Trying to get reference to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                const Msg & refPayload = pElp->payload<const Msg &>();
+                const BaseMsg & refToBasePayload = pElp->payload<const BaseMsg&>();
+
+                THEN("Envelope::payload returns const reference to payload") {
+                    REQUIRE(refPayload.data() == payload.data());
+                    REQUIRE(refToBasePayload.data() == payload.data());
+                }
+            }
+
+            AND_WHEN("Assumption about payload type is not met") {
+                THEN("Envelope::payload throws the std::bad_cast exception") {
+                    REQUIRE_THROWS_AS(pElp->payload<const char &>(), std::bad_cast);
+                }
+            }
+        }
+
+        WHEN("Trying to get pointer to payload") {
+            AND_WHEN("Assumption about payload type is met") {
+                auto pPayload = pElp->payload<const Msg *>();
+                auto pBasePayload = pElp->payload<const BaseMsg *>();
+
+                THEN("Envelope::payload returns valid pointer") {
+                    REQUIRE(pPayload != nullptr);
+                    REQUIRE(pBasePayload != nullptr);
+                    REQUIRE(pPayload->data() == payload.data());
+                    REQUIRE(pBasePayload->data() == payload.data());
                 }
             }
 

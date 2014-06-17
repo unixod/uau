@@ -62,7 +62,7 @@ const lest::test specification[] = {
 
         private:
             void secondState() {
-                if(message()->is<A>())
+                if(message()->payload<const A*>())
                     _log.append("A");
                 else
                     _log.append("B");
