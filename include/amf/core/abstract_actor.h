@@ -39,21 +39,31 @@
 #ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_H
 #define UAU_AMF_CORE_ABSTRACT_ACTOR_H
 
+#include <memory>
+#include "core/envelope_fwd.h"
 
 namespace uau {
 namespace amf {
 namespace core {
 
-
 class AbstractActor {
 public:
-    virtual ~AbstractActor() {}
-};
+    class Id;
+    typedef std::shared_ptr<const Envelope<>> Message;
 
+public:
+    virtual ~AbstractActor() {}
+
+    virtual void push(Id src, Message) = 0;     /*concurrent*/
+    virtual Message pull() = 0;                 /*concurrent*/
+    virtual Message tryPull() = 0;              /*concurrent*/
+
+    virtual void activate() = 0;
+    virtual bool tryActivate() = 0;
+};
 
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_ABSTRACT_ACTOR_H

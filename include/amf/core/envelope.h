@@ -39,33 +39,151 @@
 #ifndef UAU_AMF_CORE_ENVELOPE_H
 #define UAU_AMF_CORE_ENVELOPE_H
 
-
 #include <type_traits>
-
+#include "envelope_fwd.h"
+#include "handlerset.h"
 
 namespace uau {
 namespace amf {
 namespace core {
 
-template<class...>
-class Envelope{
+// Helpers
+template<class T>
+using is_inheritable = std::is_class<typename
+                        std::remove_pointer<typename
+                            std::remove_reference<T>::type>::type>;
+
+// TODO: in future, when c++14 will become available, use std::is_final with std::is_class together
+//template<class T>
+//struct is_inheritable : std::integral_constant<bool,
+//                            std::is_class<T>::value &&
+//                            !std::is_final<T>::value> {};
+
+template<class T, class U = void>
+using when_inheritable = typename std::enable_if<is_inheritable<T>::value, U>;
+
+template<class T, class U = void>
+using when_not_inheritable = typename std::enable_if<not is_inheritable<T>::value, U>;
+
+
+template<>
+class Envelope<>{
 public:
     template<class T>
-    bool is() const {
-        return dynamic_cast<
-                typename std::add_pointer<
-                    typename std::add_const<
-                        Envelope<T>
-                    >::type
-                >::type
-               >(this);
+    typename std::enable_if<std::is_pointer<T>::value,
+        typename when_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_pointer<T>::type>::value,
+                      "only const pointers are allowed");
+
+        return dynamic_cast<T>(this);
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_reference<T>::value,
+        typename when_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_reference<T>::type>::value,
+                      "only const references or pointers are allowed for inheritable types");
+
+        return dynamic_cast<T>(*this);
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_pointer<T>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_pointer<T>::type>::value,
+                      "only const pointers are allowed");
+
+        typedef Envelope<typename
+                    std::remove_cv<typename
+                        std::remove_pointer<T>::type>::type> E;
+
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return &envelope->_payload;
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<class T>
+    typename std::enable_if<std::is_reference<T>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload() const {
+        static_assert(std::is_const<typename
+                        std::remove_reference<T>::type>::value,
+                      "only const references are allowed");
+
+        typedef Envelope<typename
+                    std::remove_cv<typename
+                        std::remove_reference<T>::type>::type> E;
+
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return envelope->_payload;
+        } else {
+            throw std::bad_cast{};
+        }
+    }
+
+    template<class T, class... Args>
+    typename std::enable_if<std::integral_constant<bool,
+                                !std::is_pointer<T>::value &&
+                                !std::is_reference<T>::value>::value,
+        typename when_not_inheritable<T, T>::type>::type
+    payload(Args&&... args) const {
+        typedef Envelope<typename
+                    std::remove_cv<T>::type> E;
+
+        if (auto envelope = dynamic_cast<const E *>(this)) {
+            return envelope->_payload;
+        } else {
+            return {std::forward<Args>(args)...};
+        }
     }
 
     virtual ~Envelope() {}
 };
 
-template<class Message>
-class Envelope<Message> : public Envelope<> {
+template<class Payload>
+class Envelope<Payload, typename when_inheritable<Payload>::type>
+        : public Envelope<>, public Payload { // for the future is_final
+public:
+    typedef Payload type;
+
+    static_assert(!std::is_pointer<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::integral_constant<bool,
+                    std::is_const<type>::value ||
+                    std::is_volatile<type>::value>::value,
+                  "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
+
+public:
+    template<class... Args>
+    Envelope(Args&&... args) :
+        Payload(std::forward<Args>(args)...) {}
+};
+
+template<class Payload>
+class Envelope<Payload, typename when_not_inheritable<Payload>::type>
+        : public Envelope<> {
+public:
+    typedef Payload type;
+
+    static_assert(!std::is_pointer<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be pointer type");
+    static_assert(!std::is_reference<type>::value,
+                  "uau::amf::core::Envelope<T>, T must not be reference type");
+    static_assert(!std::integral_constant<bool,
+                    std::is_const<type>::value ||
+                    std::is_volatile<type>::value>::value,
+                  "uau::amf::core::Envelope<T>, T must not have any cv-qualifiers");
+
 public:
     Envelope() = default;
     Envelope(const Envelope &) = default;
@@ -74,27 +192,110 @@ public:
     Envelope & operator = (const Envelope &) = default;
     Envelope & operator = (Envelope &&) = default;
 
-    Envelope(Message&& msg) :
-        _message(msg) {}
+    template<class... Args>
+    Envelope(Args&&... args) :
+        _payload{std::forward<Args>(args)...} {}
 
-    Message & message() {
-        return _message;
-    }
-
-    const Message & message() const {
-        return _message;
-    }
-
-private:
-    Message _message;
+public:
+    Payload _payload;
 };
 
-template<class T, class... Ts>
-class Envelope<T, Ts...>;
 
+template<class...>
+struct is_envelope;
+
+template<class T>
+struct is_envelope<T> : public is_envelope<
+        typename std::remove_cv<
+            typename std::remove_pointer<
+                typename std::remove_reference<T>::type
+            >::type
+        >::type, void> {};
+
+template<class T>
+struct is_envelope<T, void> : public std::false_type {};
+
+template<class T>
+struct is_envelope<Envelope<T>, void> : public std::true_type {};
+
+
+template<class...>
+struct wrapped_type;
+
+template<class T>
+struct wrapped_type<T> : public wrapped_type<
+        typename std::remove_cv<
+            typename std::remove_pointer<
+                typename std::remove_reference<T>::type
+            >::type
+        >::type, void> {};
+
+template<class T>
+struct wrapped_type<Envelope<T>, void> {
+    typedef T type;
+};
+
+template<template<class> class Mod, bool cond, class T>
+struct apply_if {
+    typedef typename std::conditional<cond, typename Mod<T>::type, T>::type type;
+};
+
+template<class From, class To>
+struct apply_cvalifiers {
+    typedef typename apply_if<std::add_pointer, std::is_pointer<From>::value,
+        typename apply_if<std::add_lvalue_reference, std::is_lvalue_reference<From>::value,
+            typename apply_if<std::add_const, std::is_const<From>::value, To>::type
+        >::type
+    >::type type;
+};
+
+/**
+ *  enelope_cast similar as dynamic_cast, but in addition
+ *  casts to integral types too.
+ */
+
+template<class T, class E>
+typename std::enable_if<std::is_reference<T>::value, T>::type
+envelope_cast(E & envelope) {
+}
+
+template<class T, class E>
+typename std::enable_if<std::is_pointer<T>::value, T>::type
+enevelope_cast(E * envelope) {
+    return nullptr;
+}
+
+template<class T, class E>
+typename std::enable_if<std::is_integral<T>::value, T>::type
+envelope_cast(E envelope) {
+//    if (auto t = dynamic_cast<E<T>>(envelope)) {
+
+//    }
+}
 
 } // namespace core
 } // namespace amf
+
+
+/**
+ * @brief HandlerSet's matcher specializations
+ */
+template<class T>
+typename amf::core::when_inheritable<T, bool>::type
+handlerSetMatcher(const amf::core::Envelope<> * b) {
+    sizeof(amf::core::Envelope<T>); // turn on assertions
+
+    return dynamic_cast<typename
+                std::add_pointer<typename
+                    std::add_const<T>::type>::type>(b);
+}
+
+template<class T>
+typename amf::core::when_not_inheritable<T, bool>::type
+handlerSetMatcher(const amf::core::Envelope<> * b) {
+    return dynamic_cast<const amf::core::Envelope<T> *>(b);
+}
+
 } // namespace uau
 
 

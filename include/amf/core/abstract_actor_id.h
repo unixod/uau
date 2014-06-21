@@ -36,28 +36,23 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_CORE_ACTORS_STORAGE_H
-#define UAU_AMF_CORE_ACTORS_STORAGE_H
+#ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
+#define UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H
 
-
-#include "actors_db.h"
-
+#include <string>
+#include "abstract_actor.h"
 
 namespace uau {
 namespace amf {
 namespace core {
 
-
-class ActorsStorage : public ActorsDB {
+class AbstractActor::Id {
 public:
-    void insert(std::unique_ptr<Actor>);
-    void remove(Actor::Id);
+    Id(const std::string &);
 };
 
-
-} // namesace core
+} // namespace core
 } // namespace amf
 } // namespace uau
 
-
-#endif // UAU_AMF_CORE_ACTORS_STORAGE_H
+#endif // UAU_AMF_CORE_ABSTRACT_ACTOR_ID_H

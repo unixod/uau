@@ -39,21 +39,27 @@
 #ifndef UAU_AMF_DISPATCHER_H
 #define UAU_AMF_DISPATCHER_H
 
+#include "core/abstract_actor.h"
 
 namespace uau {
 namespace amf {
 
-
 class Dispatcher{
 public:
-    virtual void dispatch();    /*concurrent*/
-
     virtual ~Dispatcher() {}
-};
 
+    /**
+     * @brief includeActor - include the specified actor on the dispatching
+     */
+    virtual void includeActor(core::AbstractActor::Id, std::shared_ptr<core::AbstractActor>) = 0;
+
+    /**
+     * @brief includeActor - exclude the specified actor from the dispatching
+     */
+    virtual void excludeActor(core::AbstractActor::Id) = 0;
+};
 
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_DISPATCHER_H

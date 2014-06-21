@@ -39,36 +39,24 @@
 #ifndef UAU_AMF_ACTOR_H
 #define UAU_AMF_ACTOR_H
 
-
 #include <memory>
 #include <functional>
+#include "core/abstract_actor.h"
 #include "core/envelope.h"
 #include "handlerset.h"
-
 
 namespace uau {
 namespace amf {
 
-
 class ActorPrivate;
 
-
-class Actor {
+class Actor : public core::AbstractActor {
 public:
-    class Id;
-
-    Id id() const;                              /*concurrent*/
-    bool pendingForDeletion() const noexcept;   /*concurrent*/
-
-    std::shared_ptr<core::Envelope<>> popFromOutput();   /*concurrent*/
-    void pushToInput(std::shared_ptr<core::Envelope<>>); /*concurrent*/
-
-    void activate();                            // blocks the current thread until the input queue is empty
-    void tryActivate();
-
-    virtual ~Actor();                           // empty definition moved to cpp because std::unique_ptr's destructor requires full definition of ActorPrivate
+    virtual ~Actor();
 
 protected:
+    Actor();
+
     template<class... Msgs, class Derived, class FRet, class... FArgs, class... Args>
     void on(FRet (Derived::*mF)(FArgs...), Args&&... args) {
         _handler.setHandlerFor<core::Envelope<Msgs>...>(mF, static_cast<Derived*>(this), std::forward<Args>(args)...);
@@ -81,28 +69,62 @@ protected:
     }
 
     template<class T>
-    void send(T &&message) {
-        // FIXME: since C++14 use std::make_unique
-        std::unique_ptr<core::Envelope<T>> envelope{new core::Envelope<T>{std::forward<T>(message)}};
-        sendEnvelope(std::move(envelope));
+    void send(T &&payload) {
+        sendEnvelope(
+            std::make_shared<const core::Envelope<T>>(
+                std::forward<T>(payload)
+            )
+        );
     }
 
     /**
      * @brief get received message
      * @return received message
      */
-    std::shared_ptr<const core::Envelope<>> message() const;
+    AbstractActor::Message message() const;
+
+    template<class T>
+    T messagePayload() {
+//        return message()->payload<T>();
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_pointer<T>::value>::value, "only const pointers are allowed");
+
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_reference<T>::value>::value, "only const reference are allowed");
+
+//        core::Envelope<
+//                typename std::remove_pointer<
+//                    typename std::remove_reference<
+//                        typename std::remove_cv<T>::type
+//                    >::type
+//                >::type>
+    }
+
+//    template<class T>
+//    typename amf::core::when_not_ingeritable<T, T>::type messagePayload() {
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_pointer<T>::value>::value, "only const pointers are allowed");
+
+//        static_assert(std::integral_constant<bool,
+//                        std::is_const<T>::value ||
+//                        !std::is_reference<T>::value>::value, "only const reference are allowed");
+//    }
 
 private:
-    /**
-     * @brief Schedule this actor for deletion
-     */
-    void deleteLater();
-    void sendEnvelope(std::unique_ptr<core::Envelope<>>);
+    // core::AbstractActor //
+    void push(AbstractActor::Id, AbstractActor::Message) final override;    /*concurrent*/
+    AbstractActor::Message pull() final override;                           /*concurrent*/
+    AbstractActor::Message tryPull() final override;                        /*concurrent*/
 
+    void activate() final override;                                         // blocks the current thread until the input queue is empty
+    bool tryActivate() final override;
 
-protected:
-    Actor();                                    // this class is abstract
+private:
+    void sendEnvelope(AbstractActor::Message &&);
+    // TODO: move this member to private class
     HandlerSet<core::Envelope<>> _handler;
 
 protected:
@@ -110,9 +132,7 @@ protected:
     std::unique_ptr<ActorPrivate> d_ptr;
 };
 
-
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_ACTOR_H

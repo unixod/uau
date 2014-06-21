@@ -39,18 +39,15 @@
 #ifndef UAU_AMF_CORE_ENVELOPE_FWD_H
 #define UAU_AMF_CORE_ENVELOPE_FWD_H
 
-
 namespace uau {
 namespace amf {
 namespace core {
 
-template<class...>
+template<class Payload = void, class = void>
 class Envelope;
-
 
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_ENVELOPE_FWD_H

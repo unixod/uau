@@ -36,26 +36,33 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_ACTOR_ID_H
-#define UAU_AMF_ACTOR_ID_H
+#ifndef UAU_AMF_CORE_MASTER_ACTOR_H
+#define UAU_AMF_CORE_MASTER_ACTOR_H
 
-
-#include <string>
-#include "actor.h"
-
+#include "abstract_actor.h"
+#include "message_queue.h"
 
 namespace uau {
 namespace amf {
+namespace core {
 
+class MasterActor : public AbstractActor {
+private:
+    void push(AbstractActor::Id, AbstractActor::Message) override;  /*concurrent*/
+    AbstractActor::Message pull() override;                         /*concurrent*/
+    AbstractActor::Message tryPull() override;                      /*concurrent*/
 
-class Actor::Id {
-public:
-    Id(const std::string &);
+    void activate() override;
+    bool tryActivate() override;
+
+    AbstractActor::Id nextPendingForDeletion();
+
+private:
+    MessageQueue _messages;
 };
 
-
+} // namespace core
 } // namespace amf
 } // namespace uau
 
-
-#endif // UAU_AMF_ACTOR_ID_H
+#endif // UAU_AMF_CORE_MASTER_ACTOR_H

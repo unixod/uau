@@ -39,15 +39,11 @@
 #ifndef UAU_THREADPOOL_H
 #define UAU_THREADPOOL_H
 
-
 #include <memory>
-
 
 namespace uau {
 
-
 class BlockingThreadPoolPrivate;
-
 
 /**
   @brief Thread pool (blocking version)
@@ -118,8 +114,6 @@ protected:
     std::unique_ptr<BlockingThreadPoolPrivate> d_ptr;
 };
 
-
 } // namespace uau
-
 
 #endif // UAU_THREADPOOL_H

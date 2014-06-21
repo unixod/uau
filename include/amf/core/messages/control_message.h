@@ -39,23 +39,18 @@
 #ifndef UAU_AMF_CORE_MESSAGES_CONTROL_MESSAGE_H
 #define UAU_AMF_CORE_MESSAGES_CONTROL_MESSAGE_H
 
-
 #include "system_message.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 namespace messages {
 
-
 class ControlMessage : public SystemMessage {};
-
 
 } // namespace messages
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_MESSAGES_CONTROL_MESSAGE_H

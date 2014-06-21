@@ -39,25 +39,20 @@
 #ifndef UAU_AMF_CORE_MAIN_ROUTER_H
 #define UAU_AMF_CORE_MAIN_ROUTER_H
 
-
 #include "router.h"
-
 
 namespace uau {
 namespace amf {
 namespace core {
 
-
 class MainRouter : public Router {
 public:
     void addRouter(std::unique_ptr<Router>);
-    std::vector<Actor::Id> rout(Actor::Id, std::shared_ptr<core::Envelope<>>) override;
+    std::pair<std::vector<AbstractActor::Id>, bool> rout(AbstractActor::Id, std::shared_ptr<core::Envelope<>>) override;
 };
-
 
 } // namespace core
 } // namespace amf
 } // namespace uau
-
 
 #endif // UAU_AMF_CORE_MAIN_ROUTER_H

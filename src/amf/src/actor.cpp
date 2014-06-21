@@ -1,10 +1,10 @@
 #include "actor.h"
 #include "actor_p.h"
-
+#include "core/messages/delete.h"
+#include "core/abstract_actor_id.h"
 
 namespace amf = uau::amf;
 namespace core = amf::core;
-
 
 amf::Actor::Actor() :
     d_ptr(new ActorPrivate) {}
@@ -14,17 +14,25 @@ amf::Actor::Actor(std::unique_ptr<amf::ActorPrivate> d) :
 
 amf::Actor::~Actor() {}
 
-std::shared_ptr<core::Envelope<>> amf::Actor::popFromOutput() {
-    return d_ptr->outputQueue.waitAndPop();
-}
-
-void amf::Actor::pushToInput(std::shared_ptr<core::Envelope<>> msg) {
+void amf::Actor::push(Id /*not_used*/, AbstractActor::Message msg)
+{
     d_ptr->inputQueue.push(msg);
 }
 
-void amf::Actor::activate() {
+core::AbstractActor::Message amf::Actor::pull()
+{
+    return d_ptr->outputQueue.waitAndPop();
+}
+
+core::AbstractActor::Message amf::Actor::tryPull()
+{
+    return d_ptr->outputQueue.tryPop();
+}
+
+void amf::Actor::activate()
+{
     if(_handler.empty()) {           // actor in final state
-        deleteLater();
+        send(core::messages::Delete{});
     } else {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
         HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -35,9 +43,13 @@ void amf::Actor::activate() {
     }
 }
 
-void amf::Actor::tryActivate() {
+bool amf::Actor::tryActivate()
+{
+    bool activated = false;
+
     if(_handler.empty()) {           // actor in final state
-        deleteLater();
+        send(core::messages::Delete{});
+        activated = true;
     } else {
         if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
             HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -46,21 +58,18 @@ void amf::Actor::tryActivate() {
                 _handler = std::move(h);
             }
         }
+        activated = static_cast<bool>(d_ptr->message);
     }
+
+    return activated;
 }
 
-std::shared_ptr<const core::Envelope<>> amf::Actor::message() const {
+core::AbstractActor::Message amf::Actor::message() const
+{
     return d_ptr->message;
 }
 
-void amf::Actor::deleteLater() {
-    d_ptr->pendingForDeletion = true;
-}
-
-void amf::Actor::sendEnvelope(std::unique_ptr<core::Envelope<>> msg) {
+void amf::Actor::sendEnvelope(AbstractActor::Message &&msg)
+{
   d_ptr->outputQueue.push(std::move(msg));
-}
-
-bool amf::Actor::pendingForDeletion() const noexcept {
-    return d_ptr->pendingForDeletion;
 }

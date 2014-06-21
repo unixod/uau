@@ -39,95 +39,99 @@
 #ifndef UAU_HANDLER_SET_H
 #define UAU_HANDLER_SET_H
 
-
 #include <vector>
 #include <memory>
 #include "typeset.h"
 
-
 namespace uau {
 
+/**
+ * @brief HandlerSet matching function
+ */
+template<class Derived, class Base>
+bool handlerSetMatcher(Base b) {
+    return dynamic_cast<Derived>(b);
+}
 
 /**
-  @brief Map of typed actions
-
-  Usage:
-  @code
-    class Msg1 : public SomeBase {...};
-    class Msg2 : public SomeBase {...};
-    class Msg3 : public SomeBase {...};
-    class Msg4 : public SomeBase {...};
-    class Msg5 : public SomeBase {...};
-    class Msg6 : public SomeBase {...};
-    class Msg7 : public SomeBase {...};
-    class Msg8 : public SomeBase {...};
-
-    // handlers
-    void handlerA() {
-        std::cout << "handlerA() was invoked" << std::endl;
-    }
-
-    void handlerB() {
-        std::cout << "handlerB() was invoked" << std::endl;
-    }
-
-    void handlerC(int param, const std::string &str) {
-        std::cout << "handlerC(" << param << ", "  << str << ") was invoked" << std::endl;
-    }
-
-    void handlerD(char ch, const SomeBase *msg, const std::string &str) {
-        if(dynamic_cast<const Msg6 *>(msg))
-            std::cout << "handlerD was invoked" << std::endl;
-        else
-            std::cout << "handlerD was invoked with unexpected message" << std::endl;;
-    }
-
-    class SomeClass {
-    public:
-        void handlerE(...) {
-            std::cout << "SomeClass::handlerE(...) was invoked" << std::endl;
-        }
-    };
-
-    void func() {
-        HandlerSet<SomeBase> handlers;
-
-        // setup handlers
-        handlers.setHandlerFor<Msg1>(handlerA);
-        handlers.setHandlerFor<Msg2, Msg3, Msg4>(handlerB);
-        handlers.setHandlerFor<Msg5>(handlerC, 1, "second");
-        handlers.setHandlerFor<Msg6>(handlerD, 'c', std::placeholders::_1, "arg");
-        // handlers.setHandlerFor<Msg6, Msg7>(handlerD, 'c', std::placeholders::_1, "arg");     // this not implemented yet
-        SomeClass foo;
-        handlers.setHandlerFor<Msg8>(&SomeClass::handlerE, &foo, ...);
-
-        // handling
-        std::unique_ptr<SomeBase> msg(new Msg1);
-        handlers.handle(msg.get());    // handlerA() was invoked
-
-        msg.reset(new Msg2);
-        handlers.handle(msg.get());    // handlerB() was invoked
-
-        msg.reset(new Msg3);
-        handlers.handle(msg.get());    // handlerB() was invoked
-
-        msg.reset(new Msg4);
-        handlers.handle(msg.get());    // handlerB() was invoked
-
-        msg.reset(new Msg5);
-        handlers.handle(msg.get());    // handlerC(1, "second") was invoked
-
-        msg.reset(new Msg6);
-        handlers.handle(msg.get());    // handlerD was invoked
-
-        msg.reset(new Msg7);
-        handlers.handle(msg.get());    // handlerD was invoked with unexpected message
-
-        msg.reset(new Msg8);
-        handlers.handle(msg.get());    // SomeClass::handlerE(...) was invoked
-    }
-  @endcode
-*/
+ * @brief Map of typed actions
+ *
+ * Usage:
+ * @code
+ *  class Msg1 : public SomeBase {...};
+ *  class Msg2 : public SomeBase {...};
+ *  class Msg3 : public SomeBase {...};
+ *  class Msg4 : public SomeBase {...};
+ *  class Msg5 : public SomeBase {...};
+ *  class Msg6 : public SomeBase {...};
+ *  class Msg7 : public SomeBase {...};
+ *  class Msg8 : public SomeBase {...};
+ *
+ *  // handlers
+ *  void handlerA() {
+ *      std::cout << "handlerA() was invoked" << std::endl;
+ *  }
+ *
+ *  void handlerB() {
+ *      std::cout << "handlerB() was invoked" << std::endl;
+ *  }
+ *
+ *  void handlerC(int param, const std::string &str) {
+ *      std::cout << "handlerC(" << param << ", "  << str << ") was invoked" << std::endl;
+ *  }
+ *
+ *  void handlerD(char ch, const SomeBase *msg, const std::string &str) {
+ *      if(dynamic_cast<const Msg6 *>(msg))
+ *          std::cout << "handlerD was invoked" << std::endl;
+ *      else
+ *          std::cout << "handlerD was invoked with unexpected message" << std::endl;
+ *  }
+ *
+ *  class SomeClass {
+ *  public:
+ *      void handlerE(...) {
+ *          std::cout << "SomeClass::handlerE(...) was invoked" << std::endl;
+ *      }
+ *  };
+ *
+ *  void func() {
+ *      HandlerSet<SomeBase> handlers;
+ *       // setup handlers
+ *      handlers.setHandlerFor<Msg1>(handlerA);
+ *      handlers.setHandlerFor<Msg2, Msg3, Msg4>(handlerB);
+ *      handlers.setHandlerFor<Msg5>(handlerC, 1, "second");
+ *      handlers.setHandlerFor<Msg6>(handlerD, 'c', std::placeholders::_1, "arg");
+ *      // handlers.setHandlerFor<Msg6, Msg7>(handlerD, 'c', std::placeholders::_1, "arg");     // this not implemented yet
+ *      SomeClass foo;
+ *      handlers.setHandlerFor<Msg8>(&SomeClass::handlerE, &foo, ...);
+ *
+ *      // handling
+ *      std::unique_ptr<SomeBase> msg(new Msg1);
+ *      handlers.handle(msg.get());    // handlerA() was invoked
+ *
+ *      msg.reset(new Msg2);
+ *      handlers.handle(msg.get());    // handlerB() was invoked
+ *
+ *      msg.reset(new Msg3);
+ *      handlers.handle(msg.get());    // handlerB() was invoked
+ *
+ *      msg.reset(new Msg4);
+ *      handlers.handle(msg.get());    // handlerB() was invoked
+ *
+ *      msg.reset(new Msg5);
+ *      handlers.handle(msg.get());    // handlerC(1, "second") was invoked
+ *
+ *      msg.reset(new Msg6);
+ *      handlers.handle(msg.get());    // handlerD was invoked
+ *
+ *      msg.reset(new Msg7);
+ *      handlers.handle(msg.get());    // handlerD was invoked with unexpected message
+ *
+ *      msg.reset(new Msg8);
+ *      handlers.handle(msg.get());    // SomeClass::handlerE(...) was invoked
+ *  }
+ * @endcode
+ */
 template<class...>
 class HandlerSet;
 
@@ -182,7 +186,7 @@ public:
         _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
+        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
             _hnd(msg);
             return true;
         }
@@ -218,7 +222,7 @@ public:
         Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
 
     bool handle(const BaseType *msg) override {
-        if(!_disabled && dynamic_cast<const HandledType *>(msg)) {
+        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
             Parent::_hnd(msg);
             return true;
         }
@@ -236,8 +240,6 @@ private:
     bool _disabled = false;
 };
 
-
 } // namespace uau
-
 
 #endif // UAU_HANDLER_SET_H

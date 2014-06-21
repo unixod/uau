@@ -39,33 +39,34 @@
 #ifndef UAU_AMF_MESSAGE_QUEUE_H
 #define UAU_AMF_MESSAGE_QUEUE_H
 
-
 #include <memory>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include "core/envelope_fwd.h"
 
-
 namespace uau {
 namespace amf {
 
-
 class MessageQueue {
 public:
-    void push(std::shared_ptr<core::Envelope<>> msg);            /*concurrent*/
-    std::shared_ptr<core::Envelope<>> waitAndPop();              /*concurrent*/
-    std::shared_ptr<core::Envelope<>> tryPop();
+    typedef std::shared_ptr<const core::Envelope<>> Message;
+
+public:
+    ~MessageQueue();
+
+    void push(Message msg);     /*concurrent*/
+    Message waitAndPop();       /*concurrent*/
+    Message tryPop();
 
 private:
-    std::queue<std::shared_ptr<core::Envelope<>>> _q;
-    mutable std::mutex _mx;
-    mutable std::condition_variable _cond;
+    std::queue<Message> _q;
+    std::mutex _mx;
+    std::condition_variable _cond;
+    bool _destruction = false;
 };
-
 
 } // namespace amf
 } // namespace uau
-
 
 #endif // LIBUAU_AMF_MESSAGE_QUEUE_H

@@ -45,10 +45,10 @@ const lest::test specification[] = {
             int i = 0;
             std::generate_n(std::back_inserter(v), k, [&i](){return i++;});
 
-            for(int i = 0; i < k; i++) {
-                auto envelope = std::dynamic_pointer_cast<core::Envelope<Msg>>(queue.waitAndPop());
-                v.erase(std::lower_bound(v.begin(), v.end(), envelope->message().getNum()));
-            }
+//            for(int i = 0; i < k; i++) {
+//                auto envelope = std::dynamic_pointer_cast<core::Envelope<Msg>>(queue.waitAndPop());
+//                v.erase(std::lower_bound(v.begin(), v.end(), envelope->message().getNum()));
+//            }
 
             EXPECT(v.size() == 0);
         }
