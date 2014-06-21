@@ -49,8 +49,11 @@ namespace uau {
  * @brief HandlerSet matching function
  */
 template<class Derived, class Base>
-bool handlerSetMatcher(Base b) {
-    return dynamic_cast<Derived>(b);
+bool handlerSetMatcher(Base b)
+{
+    return dynamic_cast<typename
+            std::add_pointer<typename
+                std::add_const<Derived>::type>::type>(b);
 }
 
 /**
@@ -157,24 +160,29 @@ public:
 
     bool empty() const noexcept { return _next == nullptr; }
 
-    virtual bool handle(const BaseType *msg) {
+    virtual bool handle(const BaseType *msg)
+    {
         return _next ? _next->handle(msg) : false;
     }
 
     template<class... Ts, class Callable, class... Args>
-    void setHandlerFor(Callable &&f, Args&&... args) {
+    void setHandlerFor(Callable &&f, Args&&... args)
+    {
         disable(TypeSet<Ts...>());
 
-        if(_next)
+        if(_next) {
             _next->setHandlerFor<Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...);
-        else
+        } else {
             _next.reset(new HandlerSet<BaseType, Ts...>(std::forward<Callable>(f), std::forward<Args>(args)...));
+        }
     }
 
 protected:
-    virtual void disable(const TypeSet<> &handlerTypes) {
-        if(_next)
+    virtual void disable(const TypeSet<> &handlerTypes)
+    {
+        if(_next) {
             _next->disable(handlerTypes);
+        }
     }
 
 private:
@@ -184,19 +192,17 @@ private:
 
 template<class BaseType, class T>
 class HandlerSet<BaseType, T> : public HandlerSet<BaseType> {
-    typedef typename std::remove_const<
-        typename std::remove_pointer<T>::type
-    >::type HandledType;
-
+private:
     typedef HandlerSet<BaseType> Parent;
 
 public:
     template<class Callable, class... Args>
     HandlerSet(Callable &&f, Args&&... args) :
-        _hnd(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
+        _hnd{std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)} {}
 
-    bool handle(const BaseType *msg) override {
-        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
+    bool handle(const BaseType *msg) override
+    {
+        if(!_disabled && handlerSetMatcher<T>(msg)) {
             _hnd(msg);
             return true;
         }
@@ -205,7 +211,8 @@ public:
     }
 
 protected:
-    void disable(const TypeSet<> &handlerTypes) override {
+    void disable(const TypeSet<> &handlerTypes) override
+    {
         _disabled = handlerTypes.contains<T>();
         Parent::disable(handlerTypes);
     }
@@ -220,19 +227,17 @@ private:
 
 template<class BaseType, class T, class... Ts>
 class HandlerSet<BaseType, T, Ts...> : public HandlerSet<BaseType, Ts...> {
-    typedef typename std::remove_const<
-        typename std::remove_pointer<T>::type
-    >::type HandledType;
-
+private:
     typedef HandlerSet<BaseType, Ts...> Parent;
 
 public:
     template<class Callable, class... Args>
     HandlerSet(Callable &&f, Args&&... args) :
-        Parent(std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)) {}
+        Parent{std::bind(std::forward<Callable>(f), std::forward<Args>(args)...)} {}
 
-    bool handle(const BaseType *msg) override {
-        if(!_disabled && handlerSetMatcher<const HandledType *>(msg)) {
+    bool handle(const BaseType *msg) override
+    {
+        if(!_disabled && handlerSetMatcher<T>(msg)) {
             Parent::_hnd(msg);
             return true;
         }
@@ -241,7 +246,8 @@ public:
     }
 
 protected:
-    void disable(const TypeSet<> &handlerTypes) override {
+    void disable(const TypeSet<> &handlerTypes) override
+    {
         _disabled = handlerTypes.contains<T>();
         Parent::disable(handlerTypes);
     }
