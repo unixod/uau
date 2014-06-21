@@ -69,28 +69,28 @@ bool handlerSetMatcher(Base b) {
  *
  *  // handlers
  *  void handlerA() {
- *      std::cout << "handlerA() was invoked" << std::endl;
+ *      std::cout << "handlerA() invoked" << std::endl;
  *  }
  *
  *  void handlerB() {
- *      std::cout << "handlerB() was invoked" << std::endl;
+ *      std::cout << "handlerB() invoked" << std::endl;
  *  }
  *
  *  void handlerC(int param, const std::string &str) {
- *      std::cout << "handlerC(" << param << ", "  << str << ") was invoked" << std::endl;
+ *      std::cout << "handlerC(" << param << ", "  << str << ") invoked" << std::endl;
  *  }
  *
  *  void handlerD(char ch, const SomeBase *msg, const std::string &str) {
  *      if(dynamic_cast<const Msg6 *>(msg))
- *          std::cout << "handlerD was invoked" << std::endl;
+ *          std::cout << "handlerD invoked" << std::endl;
  *      else
- *          std::cout << "handlerD was invoked with unexpected message" << std::endl;
+ *          std::cout << "handlerD invoked with unexpected message" << std::endl;
  *  }
  *
  *  class SomeClass {
  *  public:
  *      void handlerE(...) {
- *          std::cout << "SomeClass::handlerE(...) was invoked" << std::endl;
+ *          std::cout << "SomeClass::handlerE(...) invoked" << std::endl;
  *      }
  *  };
  *
@@ -107,28 +107,38 @@ bool handlerSetMatcher(Base b) {
  *
  *      // handling
  *      std::unique_ptr<SomeBase> msg(new Msg1);
- *      handlers.handle(msg.get());    // handlerA() was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg2);
- *      handlers.handle(msg.get());    // handlerB() was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg3);
- *      handlers.handle(msg.get());    // handlerB() was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg4);
- *      handlers.handle(msg.get());    // handlerB() was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg5);
- *      handlers.handle(msg.get());    // handlerC(1, "second") was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg6);
- *      handlers.handle(msg.get());    // handlerD was invoked
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg7);
- *      handlers.handle(msg.get());    // handlerD was invoked with unexpected message
+ *      handlers.handle(msg.get());
  *
  *      msg.reset(new Msg8);
- *      handlers.handle(msg.get());    // SomeClass::handlerE(...) was invoked
+ *      handlers.handle(msg.get());
+ *
+ *      // output:
+ *      //   handlerA() invoked
+ *      //   handlerB() invoked
+ *      //   handlerB() invoked
+ *      //   handlerB() invoked
+ *      //   handlerC(1, "second") invoked
+ *      //   handlerD invoked
+ *      //   handlerD invoked with unexpected message
+ *      //   SomeClass::handlerE(...) invoked
  *  }
  * @endcode
  */
