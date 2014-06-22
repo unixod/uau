@@ -50,7 +50,7 @@ class MasterActor : public AbstractActor {
 private:
     void push(AbstractActor::Id, AbstractActor::Message) override;  /*concurrent*/
     AbstractActor::Message pull() override;                         /*concurrent*/
-    AbstractActor::Message tryPull() override;                      /*concurrent*/
+    AbstractActor::Message tryToPull() override;                    /*concurrent*/
 
     void activate() override;
     bool tryActivate() override;

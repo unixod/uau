@@ -39,10 +39,9 @@ amf::MessageQueue::Message amf::MessageQueue::waitAndPop()
     return msg;
 }
 
-amf::MessageQueue::Message amf::MessageQueue::tryPop()
+amf::MessageQueue::Message amf::MessageQueue::tryToPop()
 {
     std::lock_guard<std::mutex> lck(_mx);
-
     Message msg;
 
     if(!_q.empty()) {
@@ -51,4 +50,10 @@ amf::MessageQueue::Message amf::MessageQueue::tryPop()
     }
 
     return msg;
+}
+
+amf::MessageQueue::QueueType::size_type amf::MessageQueue::size() const
+{
+    std::lock_guard<std::mutex> lck(_mx);
+    return _q.size();
 }
