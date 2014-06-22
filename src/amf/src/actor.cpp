@@ -24,9 +24,19 @@ core::AbstractActor::Message amf::Actor::pull()
     return d_ptr->outputQueue.waitAndPop();
 }
 
-core::AbstractActor::Message amf::Actor::tryPull()
+core::AbstractActor::Message amf::Actor::tryToPull()
 {
-    return d_ptr->outputQueue.tryPop();
+    return d_ptr->outputQueue.tryToPop();
+}
+
+int amf::Actor::inputMessageQueueSize() const
+{
+    return d_ptr->inputQueue.size();
+}
+
+int amf::Actor::outputMessageQueueSize() const
+{
+    return d_ptr->outputQueue.size();
 }
 
 void amf::Actor::activate()
@@ -51,7 +61,7 @@ bool amf::Actor::tryActivate()
         send(core::messages::Delete{});
         activated = true;
     } else {
-        if(d_ptr->message = std::move(d_ptr->inputQueue.tryPop())) {
+        if(d_ptr->message = std::move(d_ptr->inputQueue.tryToPop())) {
             HandlerSet<core::Envelope<>> h = std::move(_handler);
 
             if(not h.handle(d_ptr->message.get())) {

@@ -56,7 +56,10 @@ public:
 
     virtual void push(Id src, Message) = 0;     /*concurrent*/
     virtual Message pull() = 0;                 /*concurrent*/
-    virtual Message tryPull() = 0;              /*concurrent*/
+    virtual Message tryToPull() = 0;            /*concurrent*/
+
+    virtual int inputMessageQueueSize() const = 0;
+    virtual int outputMessageQueueSize() const = 0;
 
     virtual void activate() = 0;
     virtual bool tryActivate() = 0;

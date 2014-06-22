@@ -24,7 +24,7 @@ core::AbstractActor::Message core::MasterActor::pull()
 {
 }
 
-core::AbstractActor::Message core::MasterActor::tryPull()
+core::AbstractActor::Message core::MasterActor::tryToPull()
 {
 }
 
