@@ -42,7 +42,9 @@ int amf::Actor::outputMessageQueueSize() const
 void amf::Actor::activate()
 {
     if(_handler.empty()) {           // actor in final state
-        send(core::messages::Delete{});
+        if (d_ptr->outputQueue.size() == 0) {
+            send(core::messages::Delete{});
+        }
     } else {
         d_ptr->message = std::move(d_ptr->inputQueue.waitAndPop());
         HandlerSet<core::Envelope<>> h = std::move(_handler);
@@ -58,8 +60,10 @@ bool amf::Actor::tryActivate()
     bool activated = false;
 
     if(_handler.empty()) {           // actor in final state
-        send(core::messages::Delete{});
-        activated = true;
+        if (d_ptr->outputQueue.size() == 0) {
+            send(core::messages::Delete{});
+            activated = true;
+        }
     } else {
         if(d_ptr->message = std::move(d_ptr->inputQueue.tryToPop())) {
             HandlerSet<core::Envelope<>> h = std::move(_handler);
