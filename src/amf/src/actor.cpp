@@ -29,20 +29,10 @@ core::AbstractActor::Message amf::Actor::tryToPull()
     return d_ptr->outputQueue.tryToPop();
 }
 
-int amf::Actor::inputMessageQueueSize() const
-{
-    return d_ptr->inputQueue.size();
-}
-
-int amf::Actor::outputMessageQueueSize() const
-{
-    return d_ptr->outputQueue.size();
-}
-
 void amf::Actor::activate()
 {
     if(_handler.empty()) {           // actor in final state
-        if (d_ptr->outputQueue.size() == 0) {
+        if (d_ptr->outputQueue.empty()) {
             send(core::messages::Delete{});
         }
     } else {
@@ -60,7 +50,7 @@ bool amf::Actor::tryActivate()
     bool activated = false;
 
     if(_handler.empty()) {           // actor in final state
-        if (d_ptr->outputQueue.size() == 0) {
+        if (d_ptr->outputQueue.empty()) {
             send(core::messages::Delete{});
             activated = true;
         }

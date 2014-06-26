@@ -58,9 +58,6 @@ public:
     virtual Message pull() = 0;                 /*concurrent*/
     virtual Message tryToPull() = 0;            /*concurrent*/
 
-    virtual int inputMessageQueueSize() const = 0;
-    virtual int outputMessageQueueSize() const = 0;
-
     virtual void activate() = 0;
     virtual bool tryActivate() = 0;
 };

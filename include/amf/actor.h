@@ -119,9 +119,6 @@ private:
     AbstractActor::Message pull() final override;                           /*concurrent*/
     AbstractActor::Message tryToPull() final override;                      /*concurrent*/
 
-    int inputMessageQueueSize() const override;
-    int outputMessageQueueSize() const override;
-
     void activate() final override;                                         // blocks the current thread until the input queue is empty
     bool tryActivate() final override;
 

@@ -52,8 +52,8 @@ amf::MessageQueue::Message amf::MessageQueue::tryToPop()
     return msg;
 }
 
-amf::MessageQueue::QueueType::size_type amf::MessageQueue::size() const
+bool amf::MessageQueue::empty() const
 {
     std::lock_guard<std::mutex> lck(_mx);
-    return _q.size();
+    return _q.empty();
 }
