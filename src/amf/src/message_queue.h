@@ -59,7 +59,7 @@ public:
     void push(Message msg);             /*concurrent*/
     Message waitAndPop();               /*concurrent*/
     Message tryToPop();                 /*concurrent*/
-    QueueType::size_type size() const;  /*concurrent*/
+    bool empty() const;                 /*concurrent*/
 
 private:
     std::queue<Message> _q;
