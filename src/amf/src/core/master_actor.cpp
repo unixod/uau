@@ -7,8 +7,9 @@ namespace core = uau::amf::core;
 
 void core::MasterActor::push(Id id, core::AbstractActor::Message msg)
 {
-    const core::messages::SystemMessage d;
-    core::envelope_cast<const core::messages::SystemMessage &>(d);
+//    const core::messages::SystemMessage d;
+//    core::envelope_cast<const core::messages::SystemMessage &>(d);
+    msg->payload<const core::messages::SystemMessage *>();
 //    if(core::envelope_cast<core::messages::SystemMessage>(msg)) {
 
 //    }
