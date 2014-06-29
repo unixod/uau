@@ -1,113 +1,42 @@
-#include <string>
-#include <future>
-#include <random>
-#include <deque>
-#include "lest/lest.hpp"
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
 #include "actor.h"
-#include "core/envelope.h"
-
 
 namespace amf = uau::amf;
 namespace core = amf::core;
 
+SCENARIO("Retriving messages") {
+    GIVEN("Actor, which subscribed to receive message of type T and U") {
+        WHEN("There is no messages in actor's inbox") {
+            THEN("Activation does not lead to anything") {
+            }
+        }
 
-class Msg1 {};
-class Msg2 {};
-class Msg3 {};
-class Msg4 {};
-
-
-class TestActor : public uau::amf::Actor {
-public:
-    void someState() {
-
-        on<Msg1, Msg2>(&TestActor::someState);
-        on<Msg3>(&TestActor::stateWithParams, 1, "hello");
-        on<Msg4>([]{/*same state*/});
-    }
-
-    void stateSimple() {
-    }
-
-    void stateWithParams(int, const std::string &) {
-    }
-};
-
-
-const lest::test specification[] = {
-    "transitions", []{
-        class A {};
-        class B {};
-
-        /*
-         *                              __B__
-         * \                          /       \
-         *  V                         V       /
-         * (initialState) ---A---> (secondState) ---A--> ((finalState))
-         *
-         *  this finite automata represents following regular expresion:
-         *  AB*A
-         *
-         */
-        class StateMachine : public uau::amf::Actor {
-        public:
-            // initialState
-            StateMachine() {
-                on<A>(&StateMachine::secondState);
+        WHEN("There is only one message in actor's inbox") {
+            AND_WHEN("Message type is T") {
+                THEN("Activation of actor entails an invocation of subscribed function") {
+                }
             }
 
-            std::string getLog() const {
-                return _log;
+            AND_WHEN("Message type is U") {
+                THEN("Activation of actor entails an invocation of subscribed function") {
+                }
             }
 
-        private:
-            void secondState() {
-                if(message()->payload<const A*>())
-                    _log.append("A");
-                else
-                    _log.append("B");
-
-                on<B>(&StateMachine::secondState);
-                on<A>(&StateMachine::finalState);
+            AND_WHEN("Message type does not match not T nor U") {
+                THEN("Activation does not lead to anything") {
+                }
             }
+        }
 
-            void finalState() {
-                _log.append("A");
+        WHEN("There are several messages in actor's inbox") {
+            AND_WHEN("First of them has type T, second has type U") {
+                THEN("Activation of actor entails an invocation only the function which subscribed to T") {
+                    AND_THEN("After invocation, inbox remains only one message, which type is U") {
+
+                    }
+                }
             }
-
-            std::string _log;
-        };
-
-        StateMachine sm;
-//        auto f = std::async(std::launch::async, [&sm]{
-//            std::random_device rd;
-//            std::mt19937 gen(rd());
-//            std::uniform_int_distribution<> dis(0, 1);
-
-//            while(!sm.pendingForDeletion()) {
-//                if(dis(gen))
-//                    sm.pushToInput(std::make_shared<core::Envelope<A>>());
-//                else
-//                    sm.pushToInput(std::make_shared<core::Envelope<B>>());
-//            }
-//        });
-
-//        while(!sm.pendingForDeletion())
-//            sm.activate();
-
-//        f.wait();
-
-//        auto result = sm.getLog();
-
-//        EXPECT(result.front() == 'A');
-//        EXPECT(result.back() == 'A');
-//        result.pop_back();
-//        result.erase(0, 1);
-//        EXPECT(result.find('A') == std::string::npos);
-//        EXPECT(result.empty() || (result.compare(std::string(result.size(), 'B')) == 0));
+        }
     }
-};
-
-int main() {
-    return lest::run(specification);
 }
