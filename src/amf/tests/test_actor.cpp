@@ -6,10 +6,36 @@ namespace amf = uau::amf;
 namespace core = amf::core;
 
 SCENARIO("Retriving messages") {
-    GIVEN("Actor, which subscribed to receive message of type T and U") {
+    GIVEN("Actor, which subscribed to receive message of types T and U") {
+        class SimpleActor : public amf::Actor {
+        public:
+            class T {};
+            typedef int U;
+
+        public:
+            SimpleActor() {
+                on<T>(&SimpleActor::handleTs);
+                on<U>(&SimpleActor::handleUs, "some data", 5);
+            }
+
+        private:
+            void handleTs() {
+            }
+
+            void handleUs(const std::string &str, int k) {
+            }
+
+        private:
+
+        };
+
+        SimpleActor simpleActor;
+
         WHEN("There is no messages in actor's inbox") {
             THEN("Activation does not lead to anything") {
-                FAIL();
+                amf::core::AbstractActor &actor = simpleActor;
+                actor.activate();
+
             }
         }
 
