@@ -2,6 +2,7 @@
 #include <catch.hpp>
 #include <queue>
 #include "actor.h"
+#include "core/abstract_actor_id.h"
 
 namespace amf = uau::amf;
 namespace core = amf::core;
@@ -11,6 +12,7 @@ SCENARIO("Retriving messages") {
         // Message types
         class T {};
         typedef int U;
+        class W {};
 
         enum class MessageTypeTag {T, U};
 
@@ -40,42 +42,91 @@ SCENARIO("Retriving messages") {
             REQUIRE(simpleActor._invocationLog.size() == 0);
 
             THEN("Activation does not lead to anything") {
-                actor.activate();
+                REQUIRE_FALSE(actor.tryActivate());
 
                 REQUIRE(simpleActor._invocationLog.size() == 0);
+
+                AND_THEN("actor's outbox is empty") {
+                    REQUIRE(actor.tryToPull() == nullptr);
+                }
             }
         }
 
         WHEN("There is only one message in actor's inbox") {
             amf::core::AbstractActor &actor = simpleActor;
-            auto message = std::make_shared<const amf::core::Envelope<T>>();
 
             AND_WHEN("Message type is T") {
-                actor.push({}, message);
+                core::AbstractActor::Message message = std::make_shared<const amf::core::Envelope<T>>();
+                REQUIRE(message->payload<const T *>() != nullptr);
+                actor.push({""}, message);
 
                 THEN("Activation of actor entails an invocation of subscribed function") {
-                    FAIL();
+                    REQUIRE(actor.tryActivate());
+
+                    REQUIRE(simpleActor._invocationLog.size() == 1);
+                    REQUIRE(simpleActor._invocationLog.front() == MessageTypeTag::T);
+
+                    AND_THEN("actor's outbox is empty") {
+                        REQUIRE(actor.tryToPull() == nullptr);
+                    }
                 }
             }
 
             AND_WHEN("Message type is U") {
+                core::AbstractActor::Message message = std::make_shared<const amf::core::Envelope<U>>();
+                REQUIRE(message->payload<const U *>() != nullptr);
+                actor.push({""}, message);
+
                 THEN("Activation of actor entails an invocation of subscribed function") {
-                    FAIL();
+                    REQUIRE(actor.tryActivate());
+
+                    REQUIRE(simpleActor._invocationLog.size() == 1);
+                    REQUIRE(simpleActor._invocationLog.front() == MessageTypeTag::U);
+
+                    AND_THEN("actor's outbox is empty") {
+                        REQUIRE(actor.tryToPull() == nullptr);
+                    }
                 }
             }
 
             AND_WHEN("Message type does not match not T nor U") {
+                core::AbstractActor::Message message = std::make_shared<const amf::core::Envelope<W>>();
+                REQUIRE(message->payload<const W *>() != nullptr);
+                actor.push({""}, message);
+
                 THEN("Activation does not lead to anything") {
-                    FAIL();
+                    REQUIRE(actor.tryActivate());
+
+                    REQUIRE(simpleActor._invocationLog.size() == 0);
+
+                    AND_THEN("actor's outbox is empty") {
+                        REQUIRE(actor.tryToPull() == nullptr);
+                    }
                 }
             }
         }
 
         WHEN("There are several messages in actor's inbox") {
+            amf::core::AbstractActor &actor = simpleActor;
+            core::AbstractActor::Message tMsg = std::make_shared<const amf::core::Envelope<T>>();
+            core::AbstractActor::Message uMsg = std::make_shared<const amf::core::Envelope<U>>();
+
             AND_WHEN("First of them has type T, second has type U") {
+                REQUIRE(tMsg->payload<const T *>() != nullptr);
+                actor.push({""}, tMsg);
+                REQUIRE(uMsg->payload<const U *>() != nullptr);
+                actor.push({""}, uMsg);
+
                 THEN("Activation of actor entails an invocation only the function which subscribed to T") {
-                    AND_THEN("After invocation, inbox remains only one message, which type is U") {
-                        FAIL();
+                    REQUIRE(actor.tryActivate());
+                    REQUIRE(simpleActor._invocationLog.size() == 1);
+                    REQUIRE(simpleActor._invocationLog.front() == MessageTypeTag::T);
+
+                    AND_THEN("Subsequent invocations does not lead to anything, because there is no subscriptions in 'handleTs") {
+                        simpleActor._invocationLog.pop(); // clean
+
+                        REQUIRE(actor.tryActivate());
+                        REQUIRE(simpleActor._invocationLog.size() == 0);
                     }
                 }
             }
