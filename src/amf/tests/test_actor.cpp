@@ -48,8 +48,11 @@ SCENARIO("Retriving messages") {
 
         WHEN("There is only one message in actor's inbox") {
             amf::core::AbstractActor &actor = simpleActor;
-//            actor.push({}, std::make_shared<const amf::core::Envelope<T>>());
+            auto message = std::make_shared<const amf::core::Envelope<T>>();
+
             AND_WHEN("Message type is T") {
+                actor.push({}, message);
+
                 THEN("Activation of actor entails an invocation of subscribed function") {
                     FAIL();
                 }
