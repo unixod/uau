@@ -36,35 +36,43 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_H
-#define UAU_AMF_CORE_ABSTRACT_ACTOR_H
+#ifndef UAU_AMF_CORE_ACTOR_ADDRESS_H
+#define UAU_AMF_CORE_ACTOR_ADDRESS_H
 
 #include <memory>
 #include <iosfwd>
-#include "core/envelope_fwd.h"
 
 namespace uau {
 namespace amf {
 namespace core {
 
-class AbstractActor {
-public:
-    class Id;
-    typedef std::shared_ptr<const Envelope<>> Message;
+class ActorAddressImpl;
 
-public:
-    virtual ~AbstractActor() {}
+typedef std::shared_ptr<ActorAddressImpl> ActorAddress;
 
-    virtual void push(Id src, Message) = 0;     /*concurrent*/
-    virtual Message pull() = 0;                 /*concurrent*/
-    virtual Message tryToPull() = 0;            /*concurrent*/
+// serialization/deserialization
+std::ostream & operator << (std::ostream &, const ActorAddress &);
+std::istream & operator >> (std::istream &, ActorAddress &);
 
-    virtual void activate() = 0;
-    virtual bool tryActivate() = 0;
-};
+// in order to use the ActorAddress in variety of containers
+bool operator < (const ActorAddress &, const ActorAddress &);
+bool operator == (const ActorAddress &, const ActorAddress &); // for std::equal_to
+std::size_t hash(const ActorAddress &);
 
 } // namespace core
 } // namespace amf
 } // namespace uau
 
-#endif // UAU_AMF_CORE_ABSTRACT_ACTOR_H
+namespace std {
+template<>
+struct hash<uau::amf::core::ActorAddress> {
+    typedef const uau::amf::core::ActorAddress& argument_type;
+    typedef std::size_t result_type;
+
+    result_type operator ()(argument_type key) {
+        return uau::amf::core::hash(key);
+    }
+};
+} // namespace std
+
+#endif // UAU_AMF_CORE_ACTOR_ADDRESS_H

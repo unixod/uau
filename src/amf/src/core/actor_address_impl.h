@@ -36,35 +36,33 @@
     policies, either expressed or implied, of Eldar Zakirov.
 */
 
-#ifndef UAU_AMF_CORE_ABSTRACT_ACTOR_H
-#define UAU_AMF_CORE_ABSTRACT_ACTOR_H
+#ifndef UAU_AMF_CORE_ACTOR_ADDRESS_IMPL_H
+#define UAU_AMF_CORE_ACTOR_ADDRESS_IMPL_H
 
-#include <memory>
-#include <iosfwd>
-#include "core/envelope_fwd.h"
+#include <string>
+#include "core/actor_address.h"
 
 namespace uau {
 namespace amf {
 namespace core {
 
-class AbstractActor {
+class ActorAddressImpl {
 public:
-    class Id;
-    typedef std::shared_ptr<const Envelope<>> Message;
+    ActorAddressImpl(const std::string &nodeId,
+                     const std::string &actorId) :
+        _nodeId{nodeId},
+        _actorId{actorId},
+        _hash{std::hash<std::string>{}(nodeId) ^
+              (std::hash<std::string>{}(actorId) << 1)}
+    {}
 
-public:
-    virtual ~AbstractActor() {}
-
-    virtual void push(Id src, Message) = 0;     /*concurrent*/
-    virtual Message pull() = 0;                 /*concurrent*/
-    virtual Message tryToPull() = 0;            /*concurrent*/
-
-    virtual void activate() = 0;
-    virtual bool tryActivate() = 0;
+    const std::string _actorId;
+    const std::string _nodeId;
+    const std::size_t _hash;
 };
 
 } // namespace core
 } // namespace amf
 } // namespace uau
 
-#endif // UAU_AMF_CORE_ABSTRACT_ACTOR_H
+#endif // UAU_AMF_CORE_ACTOR_ADDRESS_IMPL_H

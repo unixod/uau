@@ -11,7 +11,8 @@ set(LIBUAU_AMF_SOURCES
     actor.cpp
     message_queue.cpp
     core/abstract_actor_id.cpp
-    core/master_actor.cpp)
+    core/master_actor.cpp
+    core/actor_address_impl.cpp)
 
 add_library(${PROJECT_NAME} ${LIBUAU_AMF_SOURCES})
 
@@ -21,6 +22,7 @@ showFilesInIDE(
     "${LIBUAU_AMF_INCLUDE_DIR}/actor.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/dispatcher.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/abstract_actor.h"
+    "${LIBUAU_AMF_INCLUDE_DIR}/core/actor_address.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/abstract_actor_id.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope.h"
     "${LIBUAU_AMF_INCLUDE_DIR}/core/envelope_fwd.h"
