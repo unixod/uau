@@ -1,18 +1,19 @@
 #include "actor_address_impl.h"
+#include <stdexcept>
 
 namespace uau {
 namespace amf {
 namespace core {
 
-std::ostream & operator << (std::ostream &, const ActorAddress &)
-{
+//std::ostream & operator << (std::ostream &out, const ActorAddress &addr)
+//{
+//    // TODO: need to implement
+//}
 
-}
-
-std::istream & operator >> (std::istream &, ActorAddress &)
-{
-
-}
+//std::istream & operator >> (std::istream &, ActorAddress &)
+//{
+//    // TODO: need to implement
+//}
 
 bool operator < (const ActorAddress &addr1, const ActorAddress &addr2)
 {
