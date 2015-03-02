@@ -15,8 +15,8 @@ target_link_libraries(${PROJECT_NAME}
 
 showFilesInIDE(
     threadpool_p.h
-    "${LIBUAU_INCLUDE_DIR}/concurrency_algo.h"
-    "${LIBUAU_INCLUDE_DIR}/handlerset.h"
-    "${LIBUAU_INCLUDE_DIR}/rangeset.h"
-    "${LIBUAU_INCLUDE_DIR}/threadpool.h"
-    "${LIBUAU_INCLUDE_DIR}/typeset.h")
+    "${LIBUAU_INCLUDE_DIR}/uau/concurrency_algo.h"
+    "${LIBUAU_INCLUDE_DIR}/uau/handlerset.h"
+    "${LIBUAU_INCLUDE_DIR}/uau/rangeset.h"
+    "${LIBUAU_INCLUDE_DIR}/uau/threadpool.h"
+    "${LIBUAU_INCLUDE_DIR}/uau/typeset.h")

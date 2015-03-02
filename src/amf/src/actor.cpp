@@ -1,7 +1,7 @@
-#include "actor.h"
+#include "uau/amf/actor.h"
 #include "actor_p.h"
-#include "core/messages/delete.h"
-#include "core/abstract_actor_id.h"
+#include "uau/amf/core/messages/delete.h"
+#include "uau/amf/core/abstract_actor_id.h"
 
 namespace amf = uau::amf;
 namespace core = amf::core;

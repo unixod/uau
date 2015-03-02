@@ -40,7 +40,7 @@
 #define UAU_AMF_ACTOR_PRIVATE_H
 
 #include <atomic>
-#include "core/envelope.h"
+#include "uau/amf/core/envelope.h"
 #include "message_queue.h"
 
 namespace uau {

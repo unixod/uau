@@ -41,7 +41,7 @@
 
 #include <type_traits>
 #include "envelope_fwd.h"
-#include "handlerset.h"
+#include "uau/handlerset.h"
 
 namespace uau {
 namespace amf {

@@ -1,7 +1,7 @@
-#include "core/master_actor.h"
-#include "core/abstract_actor_id.h"
-#include "core/messages/delete.h"
-#include "core/envelope.h"
+#include "uau/amf/core/master_actor.h"
+#include "uau/amf/core/abstract_actor_id.h"
+#include "uau/amf/core/messages/delete.h"
+#include "uau/amf/core/envelope.h"
 
 namespace core = uau::amf::core;
 

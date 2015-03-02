@@ -40,7 +40,7 @@
 #define UAU_AMF_CORE_ABSTRACT_ACTOR_H
 
 #include <memory>
-#include "core/envelope_fwd.h"
+#include "uau/amf/core/envelope_fwd.h"
 
 namespace uau {
 namespace amf {

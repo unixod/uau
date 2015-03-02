@@ -43,7 +43,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-#include "core/envelope_fwd.h"
+#include "uau/amf/core/envelope_fwd.h"
 
 namespace uau {
 namespace amf {
