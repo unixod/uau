@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
-#include "handlerset.h"
-#include "core/envelope.h"
+#include "uau/handlerset.h"
+#include "uau/amf/core/envelope.h"
 
 
 namespace amf = uau::amf;

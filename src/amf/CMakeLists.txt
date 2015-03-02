@@ -5,7 +5,7 @@ set(LIBUAU_AMF_SOURCE_DIR
 
 add_subdirectory(src)
 
-if(LIBUAU_BUILD_TESTS)
+if(WITH_TESTS)
     add_subdirectory(tests)
 endif()
 

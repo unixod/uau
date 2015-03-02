@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 #include <queue>
-#include "actor.h"
-#include "core/abstract_actor_id.h"
+#include "uau/amf/actor.h"
+#include "uau/amf/core/abstract_actor_id.h"
 
 namespace amf = uau::amf;
 namespace core = amf::core;

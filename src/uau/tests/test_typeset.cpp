@@ -1,5 +1,5 @@
 #include "lest/lest.hpp"
-#include "typeset.h"
+#include "uau/typeset.h"
 
 class First;
 class Second;

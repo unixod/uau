@@ -5,9 +5,9 @@ cmake_minimum_required(VERSION 2.8)
 #===============================================================================
 #set(CMAKE_BUILD_TYPE "Release")
 
-option(LIBUAU_BUILD_TESTS  "Enable testing" OFF)
+option(WITH_TESTS  "Enable testing" OFF)
 
-if(LIBUAU_BUILD_TESTS)
+if(WITH_TESTS)
     enable_testing()
 endif()
 

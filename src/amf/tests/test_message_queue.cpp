@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "lest/lest.hpp"
 #include "message_queue.h"
-#include "core/envelope.h"
+#include "uau/amf/core/envelope.h"
 
 
 namespace amf = uau::amf;
