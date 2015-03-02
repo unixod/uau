@@ -1,3 +1,6 @@
 [submodule "libs/Catch"]
 	path = libs/Catch
 	url = git@github.com:unixod/Catch.git
+[submodule "cmake"]
+	path = cmake
+	url = git@github.com:unixod/cmake-modules.git

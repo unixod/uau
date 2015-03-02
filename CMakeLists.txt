@@ -21,7 +21,7 @@ set(CMAKE_MODULE_PATH
 include(configCXX)
 
 set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} ${LIBUAU_WALL_FLAG} ${LIBUAU_CXX11_FLAG}")
+    "${CMAKE_CXX_FLAGS} ${COMPILER_WALL_FLAG} ${COMPILER_CXX11_FLAG}")
 
 #===============================================================================
 # Setup project
